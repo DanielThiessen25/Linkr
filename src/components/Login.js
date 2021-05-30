@@ -58,21 +58,25 @@ const SignUpLink = styled.div`
     font-size: 20px;
     text-underline-position: under;
     cursor: pointer;
+    @media(max-width: 600px){
+        font-size: 17px;
+    }
 `
 
 const LoginPage = styled.div`
     width: 100%;
     height: 100%;
     background: #333333;
-    
+    display: flex;
+    @media(max-width: 600px) {
+        flex-direction: column;
+    }
 `
 
 const Logo = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
+    
     width: 65%;
-    height: 100%;
+    height: 100vh;
     background: #151515;
     display: flex;
     flex-direction: column;
@@ -82,23 +86,38 @@ const Logo = styled.div`
     padding: 0 0 150px 150px;
     box-shadow: 4px 0px 4px rgba(0, 0, 0, 0.25);
     z-index: 1;
+    @media(max-width: 600px) {
+        width: 100%;
+        height: 175px;
+        padding: 0 15%;
+        align-items: center;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    }
 `
 const Title = styled.div`
     font-family: 'Passion One', cursive;
     font-size: 106px;
-    
+    letter-spacing: 0.05em;
+    @media(max-width: 600px){
+        font-size: 76px;
+    }
 `
 const Subtitle = styled.div`
     font-family: 'Oswald', sans-serif;
     font-size: 43px;
+    line-height: 64px;
     width: 55%;
+    @media(max-width: 600px){
+        font-size: 23px;
+        width: 100%;
+        text-align: center;
+        line-height: 34px;
+    }
 `
 
 const LoginArea = styled.div`
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100%;
+    
+    height: 100vh;
     width: 35%;
     background: #333333;
     padding: 0 50px;
@@ -137,5 +156,18 @@ const LoginArea = styled.div`
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+    @media(max-width: 600px) {
+        width: 100%;
+        height: calc(100% - 175px);
+        padding: 40px 25px 0 25px;
+        button {
+            font-size: 22px;
+            height: 55px;
+        }
+        input {
+            font-size: 22px;
+            height: 55px;
+        }
     }
 `
