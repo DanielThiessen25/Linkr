@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 import UserContext from './contexts/UserContext'
@@ -11,6 +11,18 @@ export default function Login(){
     const history = useHistory()
     const { setUserInformation } = useContext(UserContext)
     const [ isLoading, setLoading ] = useState(false)
+    
+    useEffect(() => {
+        checkIfLogged()
+    })
+    
+    function checkIfLogged(){
+        const userInformation = localStorage.getItem("userInformation")
+        if(!!userInformation){
+            setUserInformation(JSON.parse(userInformation))
+            history.push('/timeline')
+        }
+    }
 
     function signIn(){
         if(email==="" || password===""){
@@ -22,6 +34,7 @@ export default function Login(){
         const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/sign-in", body)
         request.then(reply => {
             setUserInformation(reply.data)
+            localStorage.setItem("userInformation", JSON.stringify(reply.data))
             history.push('/timeline')
         })
         request.catch(() => {
