@@ -2,17 +2,17 @@ import styled from 'styled-components';
 import React from 'react';
 import {FaRegHeart} from "react-icons/fa";
 
-export default function Post() {
+export default function Post(props) {
     return (
         <Box>
             <VerticalSelector>
-                <Avatar></Avatar>
+                <Avatar><img src={props.object.user.avatar} /></Avatar>
                 <FaRegHeart size="1.7em" color="#FFFFFF" />
-                <Likes>13 likes</Likes>
+                <Likes>{props.object.likes.length} likes</Likes>
             </VerticalSelector>
             <Text>
-                <Name>Juvenal</Name>
-                <Message>Muito maneiro esse tutorial de Material UI com React, deem uma olhada! #react #material</Message>
+                <Name>{props.object.user.username}</Name>
+                <Message>{props.object.text}</Message>
                 <Bookmark></Bookmark>
             </Text>
             
@@ -23,6 +23,7 @@ export default function Post() {
 const Box = styled.div`
 width: 611px;
 height: 276px;
+margin-bottom: 16px;
 background: #171717;
 border-radius: 16px;
 display: flex;
@@ -35,7 +36,7 @@ const Text = styled.div`
     display: flex;
     flex-direction:column;
 `;
-
+ 
 const Name = styled.div`
     font-family: Lato;
     font-style: normal;
@@ -58,6 +59,12 @@ const Avatar = styled.div`
     margin-bottom:19px;
     border-radius: 26.5px;
     background: chocolate;
+
+    img{
+        width: 100%;
+        height: 100%;
+        border-radius: 26.5px;
+    }
 `;
 
 const Likes = styled.div`
