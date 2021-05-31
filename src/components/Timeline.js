@@ -77,15 +77,18 @@ export default function Timeline(){
 }
 
 const TimelinePage = styled.div`
-    padding: 125px 0 0 0;
+    padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
 `
 const Content = styled.div`
     display: flex;
+    justify-content: space-between;
+    width: 100%;
 `
 
 const Title = styled.div`
+    width: 100%;
     color: #FFFFFF;
     font-family: 'Oswald', sans-serif;
     font-weight: bold;
@@ -93,8 +96,8 @@ const Title = styled.div`
     margin-bottom: 45px;
 `
 const Posts = styled.div`
-    width: 610px;
-    margin-right: 25px;
+    width: 65%;
+    
 `
 
 const CreatePost = styled.div`
@@ -170,7 +173,7 @@ const NewPostInformations = styled.div`
 `
 
 const TrendingHashtags = styled. div`
-    width: 300px;
+    width: 30%;
     background-color: #171717;
     border-radius: 16px;
 ` 
@@ -184,6 +187,7 @@ const Trending = styled.div`
     padding: 15px;
 `
 const Hashtags = styled.div`
+    width: 100%;
     padding: 22px 15px;
     font-weight: bold;
     font-size: 19px;
