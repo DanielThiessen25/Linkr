@@ -173,7 +173,7 @@ const NewPostInformations = styled.div`
 `
 
 const TrendingHashtags = styled. div`
-    width: 30%;
+    width: 32%;
     background-color: #171717;
     border-radius: 16px;
 ` 
