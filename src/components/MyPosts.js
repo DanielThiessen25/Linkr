@@ -6,27 +6,32 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function MyPosts() {
+   
     const contaTeste = {
         email: "email@dominio.com",
         password: "senha_super_hiper_ultra_secreta"
     };
     const [user, setUser] = useState();
     const [listaPosts, setListaPosts] = useState();
+    const [token, setToken] = useState();
 
 
     useEffect(() => {
         const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/sign-in", contaTeste);
         requisicao.then(resposta => {
             setUser(resposta.data);
+            setToken(resposta.data.token);
             alert(resposta.data.token);
             loadPosts(resposta.data.token);
         });
     }, []);
 
-    function loadPosts(token) {
+  
+
+    function loadPosts(myToken) {
         const config = {
             headers: {
-                Authorization: "Bearer " + token
+                Authorization: "Bearer " + myToken
             }
         }
         const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + 1 + "/posts", config);
@@ -41,7 +46,7 @@ export default function MyPosts() {
             console.log(listaPosts);
             return (
                     listaPosts.map(item =>
-                        <Post object={item} />
+                        <Post object={item} token={token} />
                     )
                 
             );

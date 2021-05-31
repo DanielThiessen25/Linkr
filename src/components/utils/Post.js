@@ -1,20 +1,63 @@
 import styled from 'styled-components';
-import React from 'react';
-import {FaRegHeart} from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import {FaRegHeart, FaHeart} from "react-icons/fa";
+import axios from 'axios';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
     var string = description.split("#");
     var hashtags = string.splice(1, string.length);
-
+    let idUser = 1; //substituir pelo ContextAPI
+    const [liked, setLiked] = useState(false);
     console.log(string);
     console.log(hashtags);
+
+
+    useEffect(() => {
+        for(let i = 0; i < props.object.likes.length; i++){
+            if(props.object.likes[i].userId === idUser){
+                setLiked(true);
+            }
+        }  
+    }, []);
+
+    function printLikes(){
+        if(liked === true){
+            return(
+                <FaHeart size="1.7em" color="#AC0000" onClick={clickLikes}/>
+            );
+        }
+        else{
+            return(
+                <FaRegHeart size="1.7em" color="#FFFFFF" onClick={clickLikes}/>
+            );
+                
+        }
+    }
+
+    function clickLikes(){
+        const config = {
+            headers: {
+                Authorization: "Bearer " + props.token
+            }
+        }
+        if(liked === false){
+            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/like", {}, config);
+            requisicao.then();
+            setLiked(true);
+        }
+        else{
+            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/dislike", {}, config);
+            requisicao.then();
+            setLiked(false);
+        }
+    }
 
     return (
         <Box>
             <VerticalSelector>
                 <Avatar><img src={props.object.user.avatar} /></Avatar>
-                <FaRegHeart size="1.7em" color="#FFFFFF" />
+                {printLikes()}
                 <Likes>{props.object.likes.length} likes</Likes>
             </VerticalSelector>
             <Text>
