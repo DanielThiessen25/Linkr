@@ -5,13 +5,13 @@ import axios from 'axios';
 
 const token = "fba5100c-7127-4f25-b09c-034e5b849bdd";
 
-export default function Hashtags(){
+export default function Hashtags(props){
     const [hashtags, setHashtaghs] = useState([]);
     useEffect(()=>{
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/hashtags/trending";
         const config = {
             headers: {
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${props.token}`
             }
         }
         const requestPromise = axios.get(url, config);
