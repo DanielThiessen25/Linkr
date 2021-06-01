@@ -9,8 +9,6 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     let idUser = 1; //substituir pelo ContextAPI
     const [liked, setLiked] = useState(false);
-    console.log(string);
-    console.log(hashtags);
 
 
     useEffect(() => {

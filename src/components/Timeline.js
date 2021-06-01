@@ -3,6 +3,8 @@ import UserContext from './contexts/UserContext'
 import styled from 'styled-components'
 import Header from './utils/Header'
 import axios from 'axios'
+import Post from "./utils/Post";
+import { useEffect } from 'react';
 
 export default function Timeline(){
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -10,6 +12,30 @@ export default function Timeline(){
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
+    const [listPosts, setListPosts] = useState();
+
+    useEffect(() => {
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
+        requisicao.then(resposta => {
+            setListPosts(resposta.data.posts);
+        });
+    }, []);
+
+    function showPosts() {
+        if (listPosts != null) {
+            console.log(listPosts);
+            return (
+                    listPosts.map(item =>
+                        <Post object={item} token={userInformation.token} />
+                    )
+            );
+        }
+    }
 
     function publish(){
         if(newPostLink === ''){
@@ -54,6 +80,8 @@ export default function Timeline(){
                         </NewPostInformations>
                     </CreatePost>
                     
+                    {showPosts()}
+
                 </Posts>
                 <TrendingHashtags>
                     <Trending>trending</Trending>
@@ -102,6 +130,7 @@ const Posts = styled.div`
 
 const CreatePost = styled.div`
     width: 100%;
+    margin-bottom: 20px;
     display: flex;
     background-color: #FFFFFF;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -172,8 +201,9 @@ const NewPostInformations = styled.div`
     }
 `
 
-const TrendingHashtags = styled. div`
+const TrendingHashtags = styled.div`
     width: 32%;
+    height: 100%;
     background-color: #171717;
     border-radius: 16px;
 ` 

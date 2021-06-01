@@ -26,7 +26,7 @@ export default function App() {
           <Route path="/timeline" exact >
             <Timeline/>
           </Route>
-          <Route path="/myposts" exact={true}>
+          <Route path="/my-posts" exact={true}>
             <MyPosts/>
           </Route>
         </Switch>

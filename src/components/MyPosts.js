@@ -2,53 +2,41 @@ import styled from 'styled-components';
 import React, { useDebugValue } from 'react';
 import Header from "./utils/Header";
 import Post from "./utils/Post";
+import { useContext } from 'react'
+import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 export default function MyPosts() {
-   
+    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const contaTeste = {
         email: "email@dominio.com",
         password: "senha_super_hiper_ultra_secreta"
     };
     const [user, setUser] = useState();
-    const [listaPosts, setListaPosts] = useState();
+    const [listPosts, setListPosts] = useState();
     const [token, setToken] = useState();
 
 
     useEffect(() => {
-        const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/sign-in", contaTeste);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
         requisicao.then(resposta => {
-            setUser(resposta.data);
-            setToken(resposta.data.token);
-            alert(resposta.data.token);
-            loadPosts(resposta.data.token);
+            setListPosts(resposta.data.posts);
         });
     }, []);
 
-  
-
-    function loadPosts(myToken) {
-        const config = {
-            headers: {
-                Authorization: "Bearer " + myToken
-            }
-        }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + 1 + "/posts", config);
-
-        requisicao.then(resposta => {
-            setListaPosts(resposta.data.posts);
-        });
-    }
-
     function showPosts() {
-        if (listaPosts != null) {
-            console.log(listaPosts);
+        if (listPosts != null) {
+            console.log(listPosts);
             return (
-                    listaPosts.map(item =>
-                        <Post object={item} token={token} />
+                    listPosts.map(item =>
+                        <Post object={item} token={userInformation.token} />
                     )
-                
             );
         }
     }
