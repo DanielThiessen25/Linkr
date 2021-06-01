@@ -6,7 +6,7 @@ import axios from 'axios'
 import Hashtags from './Hashtags/Hashtags'
 
 export default function Timeline(){
-    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
+    const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
     const avatar = (!!userInformation) ? userInformation.user.avatar : ''
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
@@ -45,7 +45,7 @@ export default function Timeline(){
                 <Posts>
                     <CreatePost>
                         <UserPicture>
-                            <img src={avatar} /> 
+                            <img src={avatar} alt=""/> 
                         </UserPicture>
                         <NewPostInformations>
                             <CreatePostTitle>O que você tem pra favoritar hoje?</CreatePostTitle>
@@ -158,31 +158,3 @@ const NewPostInformations = styled.div`
         cursor: pointer;
     }
 `
-
-/*const TrendingHashtags = styled. div`
-    width: 32%;
-    background-color: #171717;
-    border-radius: 16px;
-` 
-const Trending = styled.div`
-    width: 100%;
-    color: #FFFFFF;
-    font-family: 'Oswald', sans-serif;
-    font-weight: bold;
-    font-size: 27px;
-    border-bottom: 1px solid #484848;
-    padding: 15px;
-`*/
-/*const Hashtags = styled.div`
-    width: 100%;
-    padding: 22px 15px;
-    font-weight: bold;
-    font-size: 19px;
-    font-family: 'Lato', sans-serif;
-    color: #FFFFFF;
-    letter-spacing: 0.05em;
-
-`
-const Hashtag = styled.div`
-
-`*/

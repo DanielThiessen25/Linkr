@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const token = "fba5100c-7127-4f25-b09c-034e5b849bdd";
-
 export default function Hashtags(props){
     const [hashtags, setHashtaghs] = useState([]);
     useEffect(()=>{
