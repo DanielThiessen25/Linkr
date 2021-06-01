@@ -24,12 +24,12 @@ export default function Post(props) {
     function printLikes(){
         if(liked === true){
             return(
-                <FaHeart size="1.7em" color="#AC0000" onClick={clickLikes}/>
+                <button><FaHeart size="1.7em" color="#AC0000" onClick={clickLikes}/></button>
             );
         }
         else{
             return(
-                <FaRegHeart size="1.7em" color="#FFFFFF" onClick={clickLikes}/>
+                <button><FaRegHeart size="1.7em" color="#FFFFFF" onClick={clickLikes}/></button>
             );
                 
         }
@@ -115,6 +115,13 @@ const VerticalSelector = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+
+    button{
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
 `;
 
 const Avatar = styled.div`
