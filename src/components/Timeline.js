@@ -14,7 +14,8 @@ export default function Timeline(){
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState();
 
-    useEffect(() => {
+    function loadPosts(){
+
         const config = {
             headers: {
                 Authorization: `Bearer ${userInformation.token}`
@@ -22,16 +23,19 @@ export default function Timeline(){
         }
         const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
         requisicao.then(resposta => {
-            setListPosts(resposta.data.posts);
+            setListPosts([...resposta.data.posts]);
         });
+    }
+
+    useEffect(() => {
+        loadPosts();
     }, []);
 
     function showPosts() {
         if (listPosts != null) {
-            console.log(listPosts);
             return (
                     listPosts.map(item =>
-                        <Post object={item} token={userInformation.token} />
+                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
                     )
             );
         }

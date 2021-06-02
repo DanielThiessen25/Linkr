@@ -2,18 +2,18 @@ import styled from 'styled-components';
 import React, { useState, useEffect } from 'react';
 import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
+import ReactTooltip from 'react-tooltip';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
     var string = description.split("#");
     var hashtags = string.splice(1, string.length);
-    let idUser = 1; //substituir pelo ContextAPI
     const [liked, setLiked] = useState(false);
-
+    const [likes, setLikes] = useState(props.object.likes.length);
 
     useEffect(() => {
         for(let i = 0; i < props.object.likes.length; i++){
-            if(props.object.likes[i].userId === idUser){
+            if(props.object.likes[i].userId === props.id){
                 setLiked(true);
             }
         }  
@@ -40,15 +40,41 @@ export default function Post(props) {
             }
         }
         if(liked === false){
-            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/like", {}, config);
-            requisicao.then();
+            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/like", {}, config); 
             setLiked(true);
+            setLikes(likes + 1);
+           
         }
         else{
             const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/dislike", {}, config);
-            requisicao.then();
             setLiked(false);
+            setLikes(likes -1);
         }
+    }
+
+    function showLikes(){
+        let sentence = "";
+        if(liked === true){
+            if(likes === 1){
+                sentence = "Você";
+            }
+            else if(likes === 2){
+                console.log(props.object.likes);
+                sentence = "Você e" + props.object.likes[1].username;
+            }
+            else if(likes == 3){
+                console.log(props.object.likes);
+                sentence = "Você,"+ props.object.likes[1].username + " e outras" + (props.object.likes.length - 1) + "pessoas";
+            }
+            
+        }
+        else{
+            
+
+        }
+        return(
+            sentence
+        );
     }
 
     return (
@@ -56,7 +82,8 @@ export default function Post(props) {
             <VerticalSelector>
                 <Avatar><img src={props.object.user.avatar} /></Avatar>
                 {printLikes()}
-                <Likes>{props.object.likes.length} likes</Likes>
+                <Likes data-tip={showLikes()}>{likes} likes</Likes>
+                <ReactTooltip type="light" place="bottom"/>
             </VerticalSelector>
             <Text>
                 <Name>{props.object.user.username}</Name>
@@ -82,7 +109,7 @@ export default function Post(props) {
 }
 
 const Box = styled.div`
-width: 611px;
+width: 100%;
 height: 276px;
 margin-bottom: 16px;
 background: #171717;
