@@ -5,6 +5,7 @@ import Header from './utils/Header'
 import axios from 'axios'
 import Post from "./utils/Post";
 import { useEffect } from 'react';
+import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -189,18 +190,4 @@ const NewPostInformations = styled.div`
         color: #FFFFFF;
         cursor: pointer;
     }
-`
-
-const Hashtags = styled.div`
-    width: 100%;
-    padding: 22px 15px;
-    font-weight: bold;
-    font-size: 19px;
-    font-family: 'Lato', sans-serif;
-    color: #FFFFFF;
-    letter-spacing: 0.05em;
-
-`
-const Hashtag = styled.div`
-
 `

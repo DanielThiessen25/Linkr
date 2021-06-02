@@ -6,6 +6,7 @@ import { useContext } from 'react'
 import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Hashtags from "./Hashtags/Hashtags";
 
 export default function MyPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
@@ -51,21 +52,7 @@ export default function MyPosts() {
             </Posts>
             
 
-            <TrendingHashtags>
-                    <Trending>trending</Trending>
-                    <Hashtags>
-                        <Hashtag># javascript</Hashtag>
-                        <Hashtag># react</Hashtag>
-                        <Hashtag># react-native</Hashtag>
-                        <Hashtag># material</Hashtag>
-                        <Hashtag># web-dev</Hashtag>
-                        <Hashtag># mobile</Hashtag>
-                        <Hashtag># css</Hashtag>
-                        <Hashtag># html</Hashtag>
-                        <Hashtag># node</Hashtag>
-                        <Hashtag># sql</Hashtag>
-                    </Hashtags>
-                </TrendingHashtags>
+            <Hashtags token={userInformation.token}/>
             </Content>
 
         </TimelinePage>
@@ -102,31 +89,3 @@ const Content = styled.div`
     width: 100%;
 `
 
-const TrendingHashtags = styled.div`
-    width: 32%;
-    height: 100%;
-    background-color: #171717;
-    border-radius: 16px;
-` 
-const Trending = styled.div`
-    width: 100%;
-    color: #FFFFFF;
-    font-family: 'Oswald', sans-serif;
-    font-weight: bold;
-    font-size: 27px;
-    border-bottom: 1px solid #484848;
-    padding: 15px;
-`
-const Hashtags = styled.div`
-    width: 100%;
-    padding: 22px 15px;
-    font-weight: bold;
-    font-size: 19px;
-    font-family: 'Lato', sans-serif;
-    color: #FFFFFF;
-    letter-spacing: 0.05em;
-
-`
-const Hashtag = styled.div`
-
-`

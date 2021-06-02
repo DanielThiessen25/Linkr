@@ -42,6 +42,8 @@ const HashTagStyles = styled.div`
     background: #171717;
     border-radius: 16px;
     width: 301px;
+    height: 100%;
+    margin-left: 20px;
     h2{
         font-family: 'Oswald', sans-serif;
         font-weight: bold;
