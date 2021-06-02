@@ -111,6 +111,7 @@ const HashtagTyped = styled.input`
         font-family: 'Lato';
         color: #575757;
         font-style: italic;
+        font-weight: normal;
     }
 `;
 
