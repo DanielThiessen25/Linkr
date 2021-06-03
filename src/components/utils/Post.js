@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
+import { Link } from 'react-router-dom';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
@@ -59,13 +60,24 @@ export default function Post(props) {
                 sentence = "Você";
             }
             else if(likes === 2){
-                console.log(props.object.likes);
-                sentence = "Você e" + props.object.likes[1].username;
+        
+                if(props.object.likes[0].userId === props.id){
+                    sentence = "Você e " + props.object.likes[1]['user.username'];
+                }
+                else{
+                    sentence = "Você e " + props.object.likes[0]['user.username'];
+                }
+                
             }
-            else if(likes == 3){
-                console.log(props.object.likes);
-                sentence = "Você,"+ props.object.likes[1].username + " e outras" + (props.object.likes.length - 1) + "pessoas";
-            }
+            else if(likes >= 3){
+                if(props.object.likes[0].userId === props.id){
+                    sentence = "Você, " + props.object.likes[1]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
+                }
+                else{
+                    sentence = "Você, " + props.object.likes[0]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
+                }
+               
+            } 
             
         }
         else{
@@ -80,7 +92,7 @@ export default function Post(props) {
     return (
         <Box>
             <VerticalSelector>
-                <Avatar><img src={props.object.user.avatar} /></Avatar>
+                <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
                 {printLikes()}
                 <Likes data-tip={showLikes()}>{likes} likes</Likes>
                 <ReactTooltip type="light" place="bottom"/>
@@ -180,8 +192,8 @@ font-weight: normal;
 font-size: 17px;
 line-height: 20px;
 color: #B7B7B7;
-margin-top: 9px;
-margin-bottom: 9px;
+margin-top: 10px;
+margin-bottom: 10px;
 display: flex;
 flex-direction: row;
 h5{
@@ -193,18 +205,19 @@ h5{
 
 const Bookmark = styled.div`
     width: 100%;
-    height:100%;
+    height: 155px;
     padding-left: 20px;
     border: 1px solid #4D4D4D;
     box-sizing: border-box;
     border-radius: 11px;
     position: relative;
+    display: flex;
+    align-items: center;
 `;
 
 const Info = styled.div`
-    width: 65%;
+    width: 60%;
     height:70%;
-    margin-top: 24px;
     display: flex;
     flex-direction: column;
     justify-content:space-between;
@@ -233,7 +246,7 @@ const Picture = styled.div`
     position: absolute;
     right: 0;
     height: 100%;
-    width: 155px;
+    width: 35%;
 
     img{
         width: 100%;
