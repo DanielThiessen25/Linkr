@@ -8,7 +8,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
 
-export default function MyPosts() {
+
+export default function MyLikes() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
 
@@ -18,7 +19,7 @@ export default function MyPosts() {
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
+        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/liked", config);
         requisicao.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
@@ -41,7 +42,7 @@ export default function MyPosts() {
     return (
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
-            <Title>my posts</Title>
+            <Title>my likes</Title>
             <Content>
             <Posts>
             {showPosts()}
