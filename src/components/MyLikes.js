@@ -7,11 +7,13 @@ import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
+import Loader from 'react-loader-spinner'
 
 
 export default function MyLikes() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
+    const [isError, setIsError] = useState(false);
 
     function loadPosts(){
         const config = {
@@ -19,10 +21,11 @@ export default function MyLikes() {
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/liked", config);
-        requisicao.then(resposta => {
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/liked", config);
+        request.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
+        request.catch(()=>setIsError(true));
     }
 
     useEffect(() => {
@@ -35,6 +38,18 @@ export default function MyLikes() {
                     listPosts.map(item =>
                         <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
                     )
+            );
+        }
+        else if(isError === true){
+            return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
+        }
+        else{
+            return(
+                <Loading>Loading <Loader type="ThreeDots" color="#FFF" size="5em" /></Loading>   
+              
             );
         }
     }
@@ -86,3 +101,18 @@ const Content = styled.div`
     width: 100%;
 `
 
+const Loading = styled.div`
+margin-left: 25%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 43px;
+`;
+
+const Warning = styled.div`
+    margin-left: 15%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 35px;
+`;

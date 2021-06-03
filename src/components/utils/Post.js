@@ -1,123 +1,132 @@
 import styled from 'styled-components';
 import React, { useState, useEffect } from 'react';
-import {FaRegHeart, FaHeart} from "react-icons/fa";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 
 export default function Post(props) {
-    let description = props.object.text+ "#teste";
+    let description = props.object.text + "#teste";
     var string = description.split("#");
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
 
     useEffect(() => {
-        for(let i = 0; i < props.object.likes.length; i++){
-            if(props.object.likes[i].userId === props.id){
+        for (let i = 0; i < props.object.likes.length; i++) {
+            if (props.object.likes[i].userId === props.id) {
                 setLiked(true);
             }
-        }  
+        }
     }, []);
 
-    function printLikes(){
-        if(liked === true){
-            return(
-                <button><FaHeart size="1.7em" color="#AC0000" onClick={clickLikes}/></button>
+    function printLikes() {
+        if (liked === true) {
+            return (
+                <button><FaHeart size="1.7em" color="#AC0000" onClick={clickLikes} /></button>
             );
         }
-        else{
-            return(
-                <button><FaRegHeart size="1.7em" color="#FFFFFF" onClick={clickLikes}/></button>
+        else {
+            return (
+                <button><FaRegHeart size="1.7em" color="#FFFFFF" onClick={clickLikes} /></button>
             );
-                
+
         }
     }
 
-    function clickLikes(){
+    function clickLikes() {
         const config = {
             headers: {
                 Authorization: "Bearer " + props.token
             }
         }
-        if(liked === false){
-            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/like", {}, config); 
+        if (liked === false) {
+            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/" + props.object.id + "/like", {}, config);
             setLiked(true);
             setLikes(likes + 1);
-           
+
         }
-        else{
-            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/dislike", {}, config);
+        else {
+            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/" + props.object.id + "/dislike", {}, config);
             setLiked(false);
-            setLikes(likes -1);
+            setLikes(likes - 1);
         }
     }
 
-    function showLikes(){
+    function showLikes() {
         let sentence = "";
-        if(liked === true){
-            if(likes === 1){
+        if (liked === true) {
+            if (likes === 1) {
                 sentence = "Você";
             }
-            else if(likes === 2){
-        
-                if(props.object.likes[0].userId === props.id){
+            else if (likes === 2) {
+
+                if (props.object.likes[0].userId === props.id) {
                     sentence = "Você e " + props.object.likes[1]['user.username'];
                 }
-                else{
+                else {
                     sentence = "Você e " + props.object.likes[0]['user.username'];
                 }
-                
+
             }
-            else if(likes >= 3){
-                if(props.object.likes[0].userId === props.id){
+            else if (likes >= 3) {
+                if (props.object.likes[0].userId === props.id) {
                     sentence = "Você, " + props.object.likes[1]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
                 }
-                else{
+                else {
                     sentence = "Você, " + props.object.likes[0]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
                 }
-               
-            } 
-            
-        }
-        else{
-            
+
+            }
 
         }
-        return(
+        else {
+            if (likes === 1) {
+                sentence = props.object.likes[0]['user.username'];
+            }
+            else if (likes === 2) {
+                sentence = props.object.likes[0]['user.username'] + " e " + props.object.likes[1]['user.username'];
+            }
+            else if (likes >= 3) {
+                sentence = props.object.likes[0]['user.username'] + ", " + props.object.likes[1]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
+            }
+        }
+        return (
             sentence
         );
     }
+    
 
-    return (
-        <Box>
-            <VerticalSelector>
-                <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
-                {printLikes()}
-                <Likes data-tip={showLikes()}>{likes} likes</Likes>
-                <ReactTooltip type="light" place="bottom"/>
-            </VerticalSelector>
-            <Text>
-                <Name>{props.object.user.username}</Name>
-                <Message>{string}
-                {hashtags.map(item => 
-                <h5>{"#"+ item + " "}</h5>
+return (
+    <Box>
+        <VerticalSelector>
+            <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
+            {printLikes()}
+            <Likes data-tip={showLikes()}>{likes} likes</Likes>
+            <ReactTooltip type="light" place="bottom" />
+        </VerticalSelector>
+        <Text>
+            <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
+            <Message>{string}
+                {hashtags.map(item =>
+                    <h5>{"#" + item + " "}</h5>
                 )}
-                
-                </Message>
-                <Bookmark>
+
+            </Message>
+            <a href={props.object.link} target="_blank" rel="noopener noreferrer"><Bookmark>
                 <Picture><img src={props.object.linkImage} /></Picture>
-                    <Info>
-                        <h2>{props.object.linkTitle}</h2>
-                        <h3>{props.object.linkDescription}</h3>
-                        <h4>{props.object.link}</h4>
-                    </Info>
-                    
-                </Bookmark> 
-            </Text>
-            
-        </Box>
-    );
+                <Info>
+                    <h2>{props.object.linkTitle}</h2>
+                    <h3>{props.object.linkDescription}</h3>
+                    <h4>{props.object.link}</h4>
+                </Info>
+
+            </Bookmark>
+            </a>
+        </Text>
+
+    </Box>
+);
 }
 
 const Box = styled.div`
@@ -137,7 +146,7 @@ const Text = styled.div`
     display: flex;
     flex-direction:column;
 `;
- 
+
 const Name = styled.div`
     font-family: Lato;
     font-style: normal;

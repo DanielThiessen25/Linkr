@@ -8,11 +8,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
 import { useParams } from 'react-router-dom';
+import Loader from 'react-loader-spinner'
 
 export default function UserPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
     const  idUser  = useParams();
+    const [name, setName] = useState("");
+    const [isError, setIsError] = useState(false);
 
     function loadPosts(){
         const config = {
@@ -20,11 +23,13 @@ export default function UserPosts() {
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        console.log(idUser);
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + idUser.id + "/posts", config);
-        requisicao.then(resposta => {
+        const requestNome = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/"+ idUser.id, config);
+        requestNome.then((resposta)=>setName(resposta.user.username));
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + idUser.id + "/posts", config);
+        request.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
+        request.catch(()=>setIsError(true));
     }
 
     useEffect(() => {
@@ -37,6 +42,18 @@ export default function UserPosts() {
                     listPosts.map(item =>
                         <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
                     )
+            );
+        }
+        else if(isError === true){
+            return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
+        }
+        else{
+            return(
+                <Loading>Loading <Loader type="ThreeDots" color="#FFF" size="5em" /></Loading>   
+              
             );
         }
     }
@@ -53,7 +70,7 @@ export default function UserPosts() {
     return (
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
-            <Title>{loadTitle()}</Title>
+            <Title>{name}</Title>
             <Content>
             <Posts>
             {showPosts()}
@@ -97,3 +114,18 @@ const Content = styled.div`
     width: 100%;
 `
 
+const Loading = styled.div`
+margin-left: 25%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 43px;
+`;
+
+const Warning = styled.div`
+    margin-left: 15%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 35px;
+`;

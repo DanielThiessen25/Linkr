@@ -6,6 +6,8 @@ import axios from 'axios'
 import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
+import Loader from 'react-loader-spinner'
+
 
 export default function Timeline(){
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -14,6 +16,7 @@ export default function Timeline(){
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState();
+    const [isError, setIsError] = useState(false);
 
     function loadPosts(){
 
@@ -22,10 +25,13 @@ export default function Timeline(){
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
-        requisicao.then(resposta => {
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
+        request.then(resposta => {
             setListPosts([...resposta.data.posts]);
-        });
+        }
+        );
+        request.catch(()=>setIsError(true));
+
     }
 
     useEffect(() => {
@@ -33,6 +39,7 @@ export default function Timeline(){
     }, []);
 
     function showPosts() {
+
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
@@ -40,6 +47,20 @@ export default function Timeline(){
                     )
             );
         }
+        else if(isError === true){
+            return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
+        }
+        else{
+            return(
+                
+                <Loading>Loading <Loader type="ThreeDots" color="#FFF" size="5em" /></Loading>   
+              
+            );
+        }
+        
     }
 
     function publish(){
@@ -86,7 +107,6 @@ export default function Timeline(){
                     </CreatePost>
                     
                     {showPosts()}
-
                 </Posts>
                 <Hashtags token={userInformation.token}/>
             </Content>
@@ -191,3 +211,19 @@ const NewPostInformations = styled.div`
         cursor: pointer;
     }
 `
+
+const Loading = styled.div`
+margin-left: 25%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 43px;
+`;
+
+const Warning = styled.div`
+    margin-left: 15%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 35px;
+`;

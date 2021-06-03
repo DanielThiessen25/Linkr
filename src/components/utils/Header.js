@@ -4,6 +4,7 @@ import UserContext from '../contexts/UserContext'
 import styled from 'styled-components'
 import { IoChevronDown } from "react-icons/io5"
 import { IconContext } from "react-icons"
+import { Link } from 'react-router-dom'
 
 export default function Header(){
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -29,7 +30,7 @@ export default function Header(){
 
     return(
         <Navbar onClick={() => {if(showMenu) setShowMenu(false)}}>
-            <Logo>linkr</Logo>
+            <Link to={"/timeline"}><Logo>linkr</Logo></Link>
             <DropdownMenu showMenu={showMenu} >
                 <DropdownButton showMenu={showMenu} onClick={() => setShowMenu(true)} >
                     <IconContext.Provider value={{className: "react-icon"}}>
