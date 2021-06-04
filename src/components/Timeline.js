@@ -3,13 +3,44 @@ import UserContext from './contexts/UserContext'
 import styled from 'styled-components'
 import Header from './utils/Header'
 import axios from 'axios'
+import Post from "./utils/Post";
+import { useEffect } from 'react';
+import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
-    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
+    const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
     const avatar = (!!userInformation) ? userInformation.user.avatar : ''
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
+    const [listPosts, setListPosts] = useState();
+
+    function loadPosts(){
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
+        requisicao.then(resposta => {
+            setListPosts([...resposta.data.posts]);
+        });
+    }
+
+    useEffect(() => {
+        loadPosts();
+    }, []);
+
+    function showPosts() {
+        if (listPosts != null) {
+            return (
+                    listPosts.map(item =>
+                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
+                    )
+            );
+        }
+    }
 
     function publish(){
         if(newPostLink === ''){
@@ -44,7 +75,7 @@ export default function Timeline(){
                 <Posts>
                     <CreatePost>
                         <UserPicture>
-                            <img src={avatar} /> 
+                            <img src={avatar} alt=""/> 
                         </UserPicture>
                         <NewPostInformations>
                             <CreatePostTitle>O que você tem pra favoritar hoje?</CreatePostTitle>
@@ -54,22 +85,10 @@ export default function Timeline(){
                         </NewPostInformations>
                     </CreatePost>
                     
+                    {showPosts()}
+
                 </Posts>
-                <TrendingHashtags>
-                    <Trending>trending</Trending>
-                    <Hashtags>
-                        <Hashtag># javascript</Hashtag>
-                        <Hashtag># react</Hashtag>
-                        <Hashtag># react-native</Hashtag>
-                        <Hashtag># material</Hashtag>
-                        <Hashtag># web-dev</Hashtag>
-                        <Hashtag># mobile</Hashtag>
-                        <Hashtag># css</Hashtag>
-                        <Hashtag># html</Hashtag>
-                        <Hashtag># node</Hashtag>
-                        <Hashtag># sql</Hashtag>
-                    </Hashtags>
-                </TrendingHashtags>
+                <Hashtags token={userInformation.token}/>
             </Content>
               
         </TimelinePage>
@@ -102,6 +121,7 @@ const Posts = styled.div`
 
 const CreatePost = styled.div`
     width: 100%;
+    margin-bottom: 20px;
     display: flex;
     background-color: #FFFFFF;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
@@ -170,32 +190,4 @@ const NewPostInformations = styled.div`
         color: #FFFFFF;
         cursor: pointer;
     }
-`
-
-const TrendingHashtags = styled. div`
-    width: 32%;
-    background-color: #171717;
-    border-radius: 16px;
-` 
-const Trending = styled.div`
-    width: 100%;
-    color: #FFFFFF;
-    font-family: 'Oswald', sans-serif;
-    font-weight: bold;
-    font-size: 27px;
-    border-bottom: 1px solid #484848;
-    padding: 15px;
-`
-const Hashtags = styled.div`
-    width: 100%;
-    padding: 22px 15px;
-    font-weight: bold;
-    font-size: 19px;
-    font-family: 'Lato', sans-serif;
-    color: #FFFFFF;
-    letter-spacing: 0.05em;
-
-`
-const Hashtag = styled.div`
-
 `
