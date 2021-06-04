@@ -1,16 +1,23 @@
 import styled from 'styled-components';
-import React, { useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
+import UserContext from '../contexts/UserContext';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
+import { FiSend } from "react-icons/fi";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
+import { AiOutlineComment } from "react-icons/ai";
 
 export default function Post(props) {
+    const { userInformation, showMenu, setShowMenu } = useContext(UserContext);
     let description = props.object.text + "#teste";
     var string = description.split("#");
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
+    const [comments, setComments] = useState();
+    const [clickComment, setClickComment]= useState(true);
+    const [inputComment, setInputComment] = useState("");
 
     useEffect(() => {
         for (let i = 0; i < props.object.likes.length; i++) {
@@ -18,6 +25,14 @@ export default function Post(props) {
                 setLiked(true);
             }
         }
+        const config = {
+            headers: {
+                Authorization: "Bearer " + props.token
+            }
+        }
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/comments", config);
+        request.then(resposta=>setComments(resposta.data.comments));
+        
     }, []);
 
     function printLikes() {
@@ -95,15 +110,42 @@ export default function Post(props) {
             sentence
         );
     }
-    
+
+    function printComments(){
+        if(comments != null){
+            return(comments.length + "  comments");
+        }
+
+    }
+
+    function showComments(){
+        if(clickComment == true){
+            return(
+                <CommentBox>
+
+                    <WriteComment>
+                         <AvatarComment><img src={userInformation.user.avatar} /></AvatarComment>
+                         <input  type="text" placeholder="write a comment..." value={inputComment} onChange={e => setInputComment(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') publishComment()}} />
+                        <button><FiSend size="1.4em" color="#FFFFFF" onClick={publishComment} /> </button>
+                    </WriteComment>
+                </CommentBox>
+            );
+        }
+    }
+
+    function publishComment(){
+
+    }
 
 return (
+    <PostContainer>
     <Box>
         <VerticalSelector>
             <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
             {printLikes()}
             <Likes data-tip={showLikes()}>{likes} likes</Likes>
             <ReactTooltip type="light" place="bottom" />
+            <Comment><button><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Comment>
         </VerticalSelector>
         <Text>
             <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
@@ -126,13 +168,21 @@ return (
         </Text>
 
     </Box>
+    {showComments()}
+    </PostContainer>
 );
 }
+
+const PostContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+    position: relative;
+`;
 
 const Box = styled.div`
 width: 100%;
 height: 276px;
-margin-bottom: 16px;
 background: #171717;
 border-radius: 16px;
 display: flex;
@@ -158,6 +208,7 @@ const Name = styled.div`
 `;
 
 const VerticalSelector = styled.div`
+width: 75px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -175,7 +226,6 @@ const Avatar = styled.div`
     height: 50px;
     margin-bottom:19px;
     border-radius: 26.5px;
-    background: chocolate;
 
     img{
         width: 100%;
@@ -186,6 +236,7 @@ const Avatar = styled.div`
 
 const Likes = styled.div`
 margin-top: 5px;
+margin-bottom: 12px;
 font-family: Lato;
 font-style: normal;
 font-weight: normal;
@@ -264,3 +315,79 @@ const Picture = styled.div`
     }
     
 `;
+
+const Comment = styled.div`
+    margin-top: 5px;
+font-family: Lato;
+font-style: normal;
+font-weight: normal;
+font-size: 11px;
+line-height: 13px;
+text-align: center;
+color: #FFFFFF;
+display: flex;
+flex-direction: column;
+align-items: center;
+`;
+
+const CommentBox = styled.div`
+    width: 100%;
+    height: auto;
+    background: #1E1E1E;
+     border-radius: 16px;
+     z-index: -1;
+     margin-top: -32px;
+     padding-top: 35px;
+    
+`;
+
+const WriteComment = styled.div`
+    height: 83px;
+    width: 100%;
+    padding: 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+
+    input{
+        width: 100%;
+        height: 40px;
+        background: #252525;
+        border-radius: 8px;
+        border: none;
+        padding-left: 15px;
+    }
+
+    input::placeholder{
+        font-family: Lato;
+        font-style: italic;
+        font-weight: normal;
+        font-size: 14px;
+        line-height: 17px;
+        letter-spacing: 0.05em;
+        color: #575757;
+    }
+    button {
+        position: absolute;
+        right:38px;
+        background: none;
+        border:none;
+        cursor: pointer;
+
+    }
+`;
+
+const AvatarComment = styled.div`
+    width: 39px;
+    height: 39px;
+    border-radius: 26.5px;
+    margin-right: 15px;
+img{
+        width: 100%;
+        height: 100%;
+        border-radius: 26.5px;
+    }
+`;
+
+
