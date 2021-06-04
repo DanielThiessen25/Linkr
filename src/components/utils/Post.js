@@ -16,7 +16,7 @@ export default function Post(props) {
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
     const [comments, setComments] = useState();
-    const [clickComment, setClickComment]= useState(true);
+    const [clickComment, setClickComment]= useState(false);
     const [inputComment, setInputComment] = useState("");
 
     useEffect(() => {
@@ -123,6 +123,17 @@ export default function Post(props) {
             return(
                 <CommentBox>
 
+                    {comments.map(item =>
+                    <CommentItem>
+                        <AvatarComment><img src={item.user.avatar}/></AvatarComment>
+                        <CommentContent>
+                            <h3>{item.user.username}</h3>
+                            <h4>{item.text}</h4>
+                        </CommentContent>
+                    </CommentItem>
+                    
+                    )}
+
                     <WriteComment>
                          <AvatarComment><img src={userInformation.user.avatar} /></AvatarComment>
                          <input  type="text" placeholder="write a comment..." value={inputComment} onChange={e => setInputComment(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') publishComment()}} />
@@ -145,7 +156,7 @@ return (
             {printLikes()}
             <Likes data-tip={showLikes()}>{likes} likes</Likes>
             <ReactTooltip type="light" place="bottom" />
-            <Comment><button><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Comment>
+            <Comment><button onClick={()=> setClickComment(true)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Comment>
         </VerticalSelector>
         <Text>
             <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
@@ -341,6 +352,16 @@ const CommentBox = styled.div`
     
 `;
 
+const CommentItem = styled.div`
+    width: 100%;
+    height: 70px;
+    padding:15px 25px 20px 25px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid #353535;
+`;
+
 const WriteComment = styled.div`
     height: 83px;
     width: 100%;
@@ -381,6 +402,7 @@ const WriteComment = styled.div`
 const AvatarComment = styled.div`
     width: 39px;
     height: 39px;
+    margin-right: 20px;
     border-radius: 26.5px;
     margin-right: 15px;
 img{
@@ -388,6 +410,24 @@ img{
         height: 100%;
         border-radius: 26.5px;
     }
+`;
+
+const CommentContent = styled.div`
+    font-family: Lato;
+    font-style: normal;
+    font-size: 14px;
+    line-height: 17px;
+
+    h3{
+        font-weight: bold;
+        color: #F3F3F3;
+        margin-bottom: 5px;
+    }
+    h4{
+        font-weight: normal;
+        color: #ACACAC;
+    }
+
 `;
 
 
