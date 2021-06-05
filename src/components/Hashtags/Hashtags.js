@@ -24,6 +24,7 @@ export default function Hashtags(props){
 
     function linkTypedHash(e){
         e.preventDefault();
+        setTypedHash("");
         const hashTrim = typedHash.trim();
         if(hashTrim.length === 0){
             return;
