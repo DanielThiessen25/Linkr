@@ -29,7 +29,7 @@ export default function Header(){
 
     return(
         <Navbar onClick={() => {if(showMenu) setShowMenu(false)}}>
-            <Logo>linkr</Logo>
+            <Logo onClick={()=>history.push("/")}>linkr</Logo>
             <DropdownMenu showMenu={showMenu} >
                 <DropdownButton showMenu={showMenu} onClick={() => setShowMenu(true)} >
                     <IconContext.Provider value={{className: "react-icon"}}>
