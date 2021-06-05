@@ -29,7 +29,7 @@ export default function Header(){
 
     return(
         <Navbar onClick={() => {if(showMenu) setShowMenu(false)}}>
-            <Logo>linkr</Logo>
+            <Logo onClick={() => history.push('/timeline')}>linkr</Logo>
             <DropdownMenu showMenu={showMenu} >
                 <DropdownButton showMenu={showMenu} onClick={() => setShowMenu(true)} >
                     <IconContext.Provider value={{className: "react-icon"}}>
@@ -68,6 +68,7 @@ const Logo = styled.div`
     letter-spacing: 0.05em;
     font-family: 'Passion One', cursive;
     color: #FFFFFF;
+    cursor: pointer;
     @media(max-width: 600px){
         font-size: 45px;
         line-height: 50px;

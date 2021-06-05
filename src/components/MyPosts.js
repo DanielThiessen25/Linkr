@@ -7,28 +7,44 @@ import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
+import { useHistory } from 'react-router-dom';
 
 export default function MyPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
-    const contaTeste = {
-        email: "email@dominio.com",
-        password: "senha_super_hiper_ultra_secreta"
-    };
     const [listPosts, setListPosts] = useState();
+    const [ isLoading, setIsLoading ] = useState(true);
+    const history = useHistory();
+    const information = JSON.parse(localStorage.getItem("userInformation"));
+    let token, id;
+
+    checkIfLogged();
+    function checkIfLogged(){
+        if(!!information){
+            token = information.token
+            id = information.user.id
+            
+        } else {
+            history.push("/")
+            
+        }
+    }
 
     function loadPosts(){
         const config = {
             headers: {
-                Authorization: `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
+        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + id + "/posts", config);
         requisicao.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
     }
 
     useEffect(() => {
+        if(!!information){
+            setUserInformation(information)
+        }
         loadPosts();
     }, []);
 
@@ -36,7 +52,7 @@ export default function MyPosts() {
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
-                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
+                        <Post object={item} token={token} id={id}/>
                     )
             );
         }
@@ -52,7 +68,7 @@ export default function MyPosts() {
             </Posts>
             
 
-            <Hashtags token={userInformation.token}/>
+            <Hashtags token={token}/>
             </Content>
 
         </TimelinePage>

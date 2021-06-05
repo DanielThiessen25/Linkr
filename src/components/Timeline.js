@@ -1,23 +1,24 @@
-import { useContext, useState } from 'react'
-import { useHistory } from 'react-router-dom'
-import UserContext from './contexts/UserContext'
-import styled from 'styled-components'
-import Header from './utils/Header'
-import axios from 'axios'
+import { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import UserContext from './contexts/UserContext';
+import styled from 'styled-components';
+import Header from './utils/Header';
+import axios from 'axios';
 import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
-    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
-    const avatar = (!!userInformation) ? userInformation.user.avatar : ''
-    const [ newPostLink, setNewPostLink ] = useState('')
-    const [ newPostComment, setNewPostComment ] = useState('')
-    const [ isPublishing, setIsPublishing ] = useState(false)
-    const [listPosts, setListPosts] = useState();
-    const history = useHistory()
+    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
+    const avatar = (!!userInformation) ? userInformation.user.avatar : '';
+    const [ newPostLink, setNewPostLink ] = useState('');
+    const [ newPostComment, setNewPostComment ] = useState('');
+    const [ isPublishing, setIsPublishing ] = useState(false);
+    const [ listPosts, setListPosts ] = useState();
+    const [ isLoading, setIsLoading ] = useState(true);
+    const history = useHistory();
     const information = JSON.parse(localStorage.getItem("userInformation"));
-    let token, id
+    let token, id;
     
     checkIfLogged();
     function checkIfLogged(){
@@ -43,7 +44,9 @@ export default function Timeline(){
         const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
         requisicao.then(resposta => {
             setListPosts([...resposta.data.posts]);
+            setIsLoading(false);
         });
+        
     }
 
     useEffect(() => {
@@ -52,7 +55,7 @@ export default function Timeline(){
         }
         loadPosts();
         
-    }, [information]);
+    }, []);
 
     function showPosts() {
         if (listPosts != null) {
@@ -73,7 +76,7 @@ export default function Timeline(){
         const body = { text: newPostComment , link: newPostLink }
         const config = {
             headers: {
-                "Authorization": `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${userInformation.token}`
             } 
         }
         const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", body, config)
@@ -82,6 +85,7 @@ export default function Timeline(){
             setIsPublishing(false)
             setNewPostLink('')
             setNewPostComment('')
+            
         })
         request.catch(() => {
             alert("Houve um erro ao publicar seu link")
@@ -106,13 +110,13 @@ export default function Timeline(){
                             <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
                         </NewPostInformations>
                     </CreatePost>
-                    
+                    {isLoading ? 'Loading...' : ''}
                     {showPosts()
                             
                     }
 
                 </Posts>
-                <Hashtags token={(information) ? information.token : ''}/>
+                <Hashtags token={token}/>
             </Content>
               
         </TimelinePage>
@@ -140,7 +144,7 @@ export const Title = styled.div`
 `
 export const Posts = styled.div`
     width: 65%;
-    
+    color: #FFFFFF;
 `
 
 const CreatePost = styled.div`
