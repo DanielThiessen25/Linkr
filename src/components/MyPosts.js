@@ -12,7 +12,6 @@ import { useHistory } from 'react-router-dom';
 export default function MyPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
-    const [ isLoading, setIsLoading ] = useState(true);
     const history = useHistory();
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
