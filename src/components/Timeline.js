@@ -13,19 +13,37 @@ export default function Timeline(){
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
-    const [listPosts, setListPosts] = useState();
+    const [listPosts, setListPosts] = useState(null);
 
-    function loadPosts(){
+    const [followingUsers, setFollowingUsers] = useState([]);
 
+    function getFollowingUsers(){
+        const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/follows";
         const config = {
             headers: {
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
+        const requestFollowing = axios.get(url, config);
+        requestFollowing.then((response)=>{
+            setFollowingUsers(response.data.users);
+        });
+    }
+
+    function loadPosts(){
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts"
+        const requisicao = axios.get(url, config);
         requisicao.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
+        requisicao.catch(err =>{
+            alert(err);
+        })
     }
 
     useEffect(() => {
@@ -33,7 +51,10 @@ export default function Timeline(){
     }, []);
 
     function showPosts() {
-        if (listPosts != null) {
+        if (listPosts !== null && listPosts.length && listPosts.length === 0){
+            return(<h2>Você não segue ninguém ainda, procure alguém na busca</h2>);
+        }
+        if (listPosts !== null) {
             return (
                     listPosts.map(item =>
                         <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
@@ -84,8 +105,10 @@ export default function Timeline(){
                             <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
                         </NewPostInformations>
                     </CreatePost>
-                    
-                    {showPosts()}
+                    {getFollowingUsers()}
+                    {followingUsers.length === 0 ?
+                    <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
+                    : showPosts()}
 
                 </Posts>
                 <Hashtags token={userInformation.token}/>
