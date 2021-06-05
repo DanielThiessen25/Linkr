@@ -119,18 +119,18 @@ export default function Timeline(){
     )
 }
 
-const TimelinePage = styled.div`
+export const TimelinePage = styled.div`
     padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
 `
-const Content = styled.div`
+export const Content = styled.div`
     display: flex;
     justify-content: space-between;
     width: 100%;
 `
 
-const Title = styled.div`
+export const Title = styled.div`
     width: 100%;
     color: #FFFFFF;
     font-family: 'Oswald', sans-serif;
@@ -138,7 +138,7 @@ const Title = styled.div`
     font-size: 43px;
     margin-bottom: 45px;
 `
-const Posts = styled.div`
+export const Posts = styled.div`
     width: 65%;
     
 `
