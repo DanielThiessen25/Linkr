@@ -19,19 +19,24 @@ export default function Post(props) {
     const [clickComment, setClickComment]= useState(false);
     const [inputComment, setInputComment] = useState("");
 
+    const config = {
+        headers: {
+            Authorization: "Bearer " + props.token
+        }
+    }
+
+    function loadComments(){
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/comments", config);
+        request.then(resposta=>setComments(resposta.data.comments));
+    }
+
     useEffect(() => {
         for (let i = 0; i < props.object.likes.length; i++) {
             if (props.object.likes[i].userId === props.id) {
                 setLiked(true);
             }
         }
-        const config = {
-            headers: {
-                Authorization: "Bearer " + props.token
-            }
-        }
-        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/comments", config);
-        request.then(resposta=>setComments(resposta.data.comments));
+        loadComments();
         
     }, []);
 
@@ -50,19 +55,15 @@ export default function Post(props) {
     }
 
     function clickLikes() {
-        const config = {
-            headers: {
-                Authorization: "Bearer " + props.token
-            }
-        }
+       
         if (liked === false) {
-            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/" + props.object.id + "/like", {}, config);
+            const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/" + props.object.id + "/like", {}, config);
             setLiked(true);
             setLikes(likes + 1);
 
         }
         else {
-            const requisicao = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/" + props.object.id + "/dislike", {}, config);
+            const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/" + props.object.id + "/dislike", {}, config);
             setLiked(false);
             setLikes(likes - 1);
         }
@@ -118,6 +119,12 @@ export default function Post(props) {
 
     }
 
+    function Subtitle(item){
+        if(item.user.username === props.object.user.username){
+            return("• post’s author");
+        }
+    }
+
     function showComments(){
         if(clickComment == true){
             return(
@@ -127,7 +134,7 @@ export default function Post(props) {
                     <CommentItem>
                         <AvatarComment><img src={item.user.avatar}/></AvatarComment>
                         <CommentContent>
-                            <h3>{item.user.username}</h3>
+                            <h3>{item.user.username} <h5>{Subtitle(item)}</h5></h3>
                             <h4>{item.text}</h4>
                         </CommentContent>
                     </CommentItem>
@@ -136,8 +143,8 @@ export default function Post(props) {
 
                     <WriteComment>
                          <AvatarComment><img src={userInformation.user.avatar} /></AvatarComment>
-                         <input  type="text" placeholder="write a comment..." value={inputComment} onChange={e => setInputComment(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') publishComment()}} />
-                        <button><FiSend size="1.4em" color="#FFFFFF" onClick={publishComment} /> </button>
+                        <input  disabled={false} type="text" placeholder="write a comment..."  value={inputComment} onChange={e => setInputComment(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') publishComment()}} />
+                        <button onClick={publishComment}><FiSend size="1.4em" color="#FFFFFF"  /> </button>
                     </WriteComment>
                 </CommentBox>
             );
@@ -145,7 +152,18 @@ export default function Post(props) {
     }
 
     function publishComment(){
-
+        const commentObject = {
+            id:props.object.id, 
+            text: inputComment,
+            user:{
+                id:userInformation.user.id,
+                username:userInformation.user.username,
+                avatar:userInformation.user.avatar
+            }
+        }
+        const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/"+props.object.id+"/comment",commentObject,config);
+        request.then(loadComments);
+        setInputComment("");
     }
 
 return (
@@ -156,7 +174,7 @@ return (
             {printLikes()}
             <Likes data-tip={showLikes()}>{likes} likes</Likes>
             <ReactTooltip type="light" place="bottom" />
-            <Comment><button onClick={()=> setClickComment(true)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Comment>
+            <Comment><button onClick={()=> setClickComment(!clickComment)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Comment>
         </VerticalSelector>
         <Text>
             <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
@@ -199,6 +217,7 @@ border-radius: 16px;
 display: flex;
 flex-direction: row;
 padding: 20px;
+z-index: 2;
 `;
 
 const Text = styled.div`
@@ -305,6 +324,7 @@ const Info = styled.div`
     font-size: 11px;
     line-height: 13px;
     color: #9B9595;
+
     }
     h4{
     font-size: 11px;
@@ -346,7 +366,6 @@ const CommentBox = styled.div`
     height: auto;
     background: #1E1E1E;
      border-radius: 16px;
-     z-index: -1;
      margin-top: -32px;
      padding-top: 35px;
     
@@ -378,6 +397,7 @@ const WriteComment = styled.div`
         border-radius: 8px;
         border: none;
         padding-left: 15px;
+        color: white;
     }
 
     input::placeholder{
@@ -422,6 +442,13 @@ const CommentContent = styled.div`
         font-weight: bold;
         color: #F3F3F3;
         margin-bottom: 5px;
+        display: flex;
+        flex-direction: row;
+
+        h5{
+            margin-left: 5px;
+            color: #565656;
+        }
     }
     h4{
         font-weight: normal;
