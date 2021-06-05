@@ -1,4 +1,5 @@
 import { useContext, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import UserContext from './contexts/UserContext'
 import styled from 'styled-components'
 import Header from './utils/Header'
@@ -8,18 +9,35 @@ import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
-    const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
+    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
     const avatar = (!!userInformation) ? userInformation.user.avatar : ''
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState();
+    const history = useHistory()
+    const information = JSON.parse(localStorage.getItem("userInformation"));
+    let token, id
+    
+    checkIfLogged();
+    function checkIfLogged(){
+        if(!!information){
+            token = information.token
+            id = information.user.id
+            
+        } else {
+            history.push("/")
+            
+        }
+    }
+    
+
 
     function loadPosts(){
 
         const config = {
             headers: {
-                Authorization: `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${token}`
             }
         }
         const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
@@ -29,14 +47,18 @@ export default function Timeline(){
     }
 
     useEffect(() => {
+        if(!!information){
+            setUserInformation(information)
+        }
         loadPosts();
-    }, []);
+        
+    }, [information]);
 
     function showPosts() {
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
-                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
+                        <Post object={item} token={token} id={id}/>
                     )
             );
         }
@@ -85,10 +107,12 @@ export default function Timeline(){
                         </NewPostInformations>
                     </CreatePost>
                     
-                    {showPosts()}
+                    {showPosts()
+                            
+                    }
 
                 </Posts>
-                <Hashtags token={userInformation.token}/>
+                <Hashtags token={(information) ? information.token : ''}/>
             </Content>
               
         </TimelinePage>
