@@ -5,6 +5,7 @@ import Hashtags from "./Hashtags";
 import { useContext, useState } from "react";
 import UserContext from "../contexts/UserContext";
 import axios from "axios";
+import Post from "../utils/Post";
 
 export default function HashtagPage(){
     const { hashtag } = useParams();
@@ -27,13 +28,25 @@ export default function HashtagPage(){
         })
     }
 
+
     return(
         <TimelinePage>
             <Header/>
             <Title># {hashtag}</Title>
             <Content>
                 <Posts>
-
+                    {getHashtagPosts()}
+                    {posts.length === 0 ?
+                        <h2>Carregando posts dessa hashtag</h2>
+                    :   posts.map((post)=>{
+                            return(
+                                <Post object={post}
+                                token={userInformation.token}
+                                id={userInformation.user.id}
+                                />
+                            );
+                    })
+                    }
                 </Posts>
                 <Hashtags token={userInformation.token}/>
             </Content>
