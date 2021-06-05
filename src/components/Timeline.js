@@ -3,7 +3,9 @@ import UserContext from './contexts/UserContext'
 import styled from 'styled-components'
 import Header from './utils/Header'
 import axios from 'axios'
-import Hashtags from './Hashtags/Hashtags'
+import Post from "./utils/Post";
+import { useEffect } from 'react';
+import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -11,6 +13,34 @@ export default function Timeline(){
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
+    const [listPosts, setListPosts] = useState();
+
+    function loadPosts(){
+
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
+        requisicao.then(resposta => {
+            setListPosts([...resposta.data.posts]);
+        });
+    }
+
+    useEffect(() => {
+        loadPosts();
+    }, []);
+
+    function showPosts() {
+        if (listPosts != null) {
+            return (
+                    listPosts.map(item =>
+                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
+                    )
+            );
+        }
+    }
 
     function publish(){
         if(newPostLink === ''){
@@ -55,6 +85,8 @@ export default function Timeline(){
                         </NewPostInformations>
                     </CreatePost>
                     
+                    {showPosts()}
+
                 </Posts>
                 <Hashtags token={userInformation.token}/>
             </Content>
@@ -89,6 +121,7 @@ export const Posts = styled.div`
 
 const CreatePost = styled.div`
     width: 100%;
+    margin-bottom: 20px;
     display: flex;
     background-color: #FFFFFF;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
