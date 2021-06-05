@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
+import LinkDialog from './LinkDialog';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
@@ -10,6 +11,7 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
+    const [linkToDialog, setLinkToDialog] = useState(false);
 
     useEffect(() => {
         for(let i = 0; i < props.object.likes.length; i++){
@@ -77,6 +79,12 @@ export default function Post(props) {
         );
     }
 
+    if(linkToDialog){
+        return(
+            <LinkDialog link={props.object.link} setDialogState={setLinkToDialog}/>
+        );
+    }
+
     return (
         <Box>
             <VerticalSelector>
@@ -93,7 +101,7 @@ export default function Post(props) {
                 )}
                 
                 </Message>
-                <Bookmark>
+                <Bookmark onClick={() => setLinkToDialog(true)}>
                 <Picture><img src={props.object.linkImage} /></Picture>
                     <Info>
                         <h2>{props.object.linkTitle}</h2>
