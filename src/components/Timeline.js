@@ -52,7 +52,7 @@ export default function Timeline(){
 
     function showPosts() {
         if (listPosts !== null && listPosts.length && listPosts.length === 0){
-            return(<h2>Você não segue ninguém ainda, procure alguém na busca</h2>);
+            return(<h2>Nenhuma publicação encontrada.</h2>);
         }
         if (listPosts !== null) {
             return (
