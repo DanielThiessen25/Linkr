@@ -1,5 +1,4 @@
 import { useContext, useState } from 'react'
-import { useHistory } from 'react-router-dom'
 import UserContext from './contexts/UserContext'
 import styled from 'styled-components'
 import Header from './utils/Header'
@@ -9,56 +8,56 @@ import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
-    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
+    const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
     const avatar = (!!userInformation) ? userInformation.user.avatar : ''
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
-    const [listPosts, setListPosts] = useState();
-    const history = useHistory()
-    const information = JSON.parse(localStorage.getItem("userInformation"));
-    let token, id
-    
-    checkIfLogged();
-    function checkIfLogged(){
-        if(!!information){
-            token = information.token
-            id = information.user.id
-            
-        } else {
-            history.push("/")
-            
-        }
-    }
-    
+    const [listPosts, setListPosts] = useState(null);
 
+    const [followingUsers, setFollowingUsers] = useState([]);
 
-    function loadPosts(){
-
+    function getFollowingUsers(){
+        const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/follows";
         const config = {
             headers: {
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
-        requisicao.then(resposta => {
-            setListPosts([...resposta.data.posts]);
+        const requestFollowing = axios.get(url, config);
+        requestFollowing.then((response)=>{
+            setFollowingUsers(response.data.users);
         });
     }
 
-    useEffect(() => {
-        if(!!information){
-            setUserInformation(information)
+    function loadPosts(){
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
         }
+        const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts"
+        const requisicao = axios.get(url, config);
+        requisicao.then(resposta => {
+            setListPosts([...resposta.data.posts]);
+        });
+        requisicao.catch(err =>{
+            alert(err);
+        })
+    }
+
+    useEffect(() => {
         loadPosts();
-        
-    }, [information]);
+    }, []);
 
     function showPosts() {
-        if (listPosts != null) {
+        if (listPosts !== null && listPosts.length && listPosts.length === 0){
+            return(<h2>Você não segue ninguém ainda, procure alguém na busca</h2>);
+        }
+        if (listPosts !== null) {
             return (
                     listPosts.map(item =>
-                        <Post object={item} token={token} id={id}/>
+                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
                     )
             );
         }
@@ -106,13 +105,13 @@ export default function Timeline(){
                             <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
                         </NewPostInformations>
                     </CreatePost>
-                    
-                    {showPosts()
-                            
-                    }
+                    {getFollowingUsers()}
+                    {followingUsers.length === 0 ?
+                    <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
+                    : showPosts()}
 
                 </Posts>
-                <Hashtags token={(information) ? information.token : ''}/>
+                <Hashtags token={userInformation.token}/>
             </Content>
               
         </TimelinePage>
@@ -159,7 +158,6 @@ const UserPicture = styled.div`
         height: 50px;
         border-radius: 50%;
     }
-
 `
 const CreatePostTitle = styled.div`
     font-weight: 300;
