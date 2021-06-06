@@ -7,11 +7,14 @@ import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
+import { useParams } from 'react-router-dom';
 import Loader from 'react-loader-spinner'
 
-export default function MyPosts() {
+export default function UserPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
+    const  idUser  = useParams();
+    const [name, setName] = useState("");
     const [isError, setIsError] = useState(false);
 
     function loadPosts(){
@@ -20,7 +23,9 @@ export default function MyPosts() {
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
+        const requestNome = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/"+ idUser.id, config);
+        requestNome.then((resposta)=>setName(resposta.user.username));
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + idUser.id + "/posts", config);
         request.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
@@ -39,11 +44,11 @@ export default function MyPosts() {
                     )
             );
         }
-        else if(listPosts == []){
-            return(<Warning>No posts found</Warning>);
-        }
         else if(isError === true){
             return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
         }
         else{
             return(
@@ -53,10 +58,19 @@ export default function MyPosts() {
         }
     }
 
+    function loadTitle(){
+        if(listPosts != null){
+            return(
+                listPosts[0].user.username + "'s posts"
+            );
+        }
+        
+    }
+
     return (
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
-            <Title>my posts</Title>
+            <Title>{name}</Title>
             <Content>
             <Posts>
             {showPosts()}

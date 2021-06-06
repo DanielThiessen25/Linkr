@@ -9,7 +9,8 @@ import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
 import Loader from 'react-loader-spinner'
 
-export default function MyPosts() {
+
+export default function MyLikes() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
     const [isError, setIsError] = useState(false);
@@ -20,7 +21,7 @@ export default function MyPosts() {
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/liked", config);
         request.then(resposta => {
             setListPosts([...resposta.data.posts]);
         });
@@ -39,11 +40,11 @@ export default function MyPosts() {
                     )
             );
         }
-        else if(listPosts == []){
-            return(<Warning>No posts found</Warning>);
-        }
         else if(isError === true){
             return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
         }
         else{
             return(
@@ -56,7 +57,7 @@ export default function MyPosts() {
     return (
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
-            <Title>my posts</Title>
+            <Title>my likes</Title>
             <Content>
             <Posts>
             {showPosts()}

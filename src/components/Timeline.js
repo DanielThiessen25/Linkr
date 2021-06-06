@@ -6,6 +6,8 @@ import axios from 'axios'
 import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
+import Loader from 'react-loader-spinner'
+
 import useInterval from 'react-useinterval'
 
 export default function Timeline(){
@@ -15,6 +17,7 @@ export default function Timeline(){
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState(null);
+    const [isError, setIsError] = useState(false);
 
     const [followingUsers, setFollowingUsers] = useState([]);
 
@@ -64,6 +67,20 @@ export default function Timeline(){
                     )
             );
         }
+        else if(isError === true){
+            return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
+        }
+        else{
+            return(
+                
+                <Loading>Loading <Loader type="ThreeDots" color="#FFF" size="5em" /></Loading>   
+              
+            );
+        }
+        
     }
 
     function publish(){
@@ -217,3 +234,19 @@ const NewPostInformations = styled.div`
         cursor: pointer;
     }
 `
+
+const Loading = styled.div`
+margin-left: 25%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 43px;
+`;
+
+const Warning = styled.div`
+    margin-left: 15%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 35px;
+`;
