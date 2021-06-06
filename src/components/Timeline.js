@@ -15,12 +15,8 @@ export default function Timeline(){
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
-<<<<<<< HEAD
-    const [listPosts, setListPosts] = useState();
-    const [isError, setIsError] = useState(false);
-=======
     const [listPosts, setListPosts] = useState(null);
->>>>>>> origin
+    const [isError, setIsError] = useState(false);
 
     const [followingUsers, setFollowingUsers] = useState([]);
 
@@ -43,15 +39,6 @@ export default function Timeline(){
                 Authorization: `Bearer ${userInformation.token}`
             }
         }
-<<<<<<< HEAD
-        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", config);
-        request.then(resposta => {
-            setListPosts([...resposta.data.posts]);
-        }
-        );
-        request.catch(()=>setIsError(true));
-
-=======
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts"
         const requisicao = axios.get(url, config);
         requisicao.then(resposta => {
@@ -60,7 +47,6 @@ export default function Timeline(){
         requisicao.catch(err =>{
             alert(err);
         })
->>>>>>> origin
     }
 
     useEffect(() => {
@@ -68,15 +54,10 @@ export default function Timeline(){
     }, []);
 
     function showPosts() {
-<<<<<<< HEAD
-
-        if (listPosts != null) {
-=======
         if (listPosts !== null && listPosts.length && listPosts.length === 0){
             return(<h2>Nenhuma publicação encontrada.</h2>);
         }
         if (listPosts !== null) {
->>>>>>> origin
             return (
                     listPosts.map(item =>
                         <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
@@ -141,16 +122,11 @@ export default function Timeline(){
                             <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
                         </NewPostInformations>
                     </CreatePost>
-<<<<<<< HEAD
-                    
-                    {showPosts()}
-=======
                     {getFollowingUsers()}
                     {followingUsers.length === 0 ?
                     <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
                     : showPosts()}
 
->>>>>>> origin
                 </Posts>
                 <Hashtags token={userInformation.token}/>
             </Content>
