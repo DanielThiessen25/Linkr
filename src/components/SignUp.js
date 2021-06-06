@@ -12,13 +12,10 @@ export default function SignUp(){
     const [ isLoading, setLoading ] = useState(false)
     const history = useHistory()
 
-    function signUp(){
-        if( email === "" || password === "" || username === "" || picture === ""){
-            alert("preencha todos os campos")
-            return
-        }
+    function signUp(event){
+        event.preventDefault()
         setLoading(true)
-        const body = { email, password, username, pictureUrl: picture}
+        const body = { email: email.trim(), password, username: username.trim(), pictureUrl: picture.trim()}
         const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/sign-up", body)
         request.then(reply => {
             console.log(reply.data)
@@ -37,13 +34,15 @@ export default function SignUp(){
                 <Subtitle>save, share and discover the best links on the web</Subtitle>
             </Logo>
             <SignUpArea isLoading={isLoading}>
-                <input disabled={isLoading} type="text" placeholder="e-mail" value={email} onChange={e => setEmail(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') signUp()}} />
-                <input disabled={isLoading} type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') signUp()}} />
-                <input disabled={isLoading} type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') signUp()}} />
-                <input disabled={isLoading} type="text" placeholder="picture url" value={picture} onChange={e => setPicture(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') signUp()}} />
-                <button disabled={isLoading} onClick={signUp}>
-                    {(isLoading) ? <Loader type="ThreeDots" color="#FFF"  /> : 'Sign Up' }
-                </button>
+                <form onSubmit={signUp}>
+                    <input required disabled={isLoading} type="email" placeholder="e-mail" value={email} onChange={e => setEmail(e.target.value)}  />
+                    <input required disabled={isLoading} type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)}  />
+                    <input required disabled={isLoading} type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)}  />
+                    <input required disabled={isLoading} type="text" placeholder="picture url" value={picture} onChange={e => setPicture(e.target.value)}  />
+                    <button required disabled={isLoading} >
+                        {(isLoading) ? <Loader type="ThreeDots" color="#FFF"  /> : 'Sign Up' }
+                    </button>
+                </form>
                 <LoginLink disabled={isLoading} onClick={() => history.push('/')}>Switch back to log in</LoginLink>
             </SignUpArea>
         </SignUpPage>

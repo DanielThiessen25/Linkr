@@ -62,7 +62,7 @@ export default function Post(props) {
                 console.log(props.object.likes);
                 sentence = "Você e" + props.object.likes[1].username;
             }
-            else if(likes == 3){
+            else if(likes === 3){
                 console.log(props.object.likes);
                 sentence = "Você,"+ props.object.likes[1].username + " e outras" + (props.object.likes.length - 1) + "pessoas";
             }

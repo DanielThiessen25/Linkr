@@ -9,13 +9,12 @@ import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
 
 export default function Timeline(){
-    const { userInformation, setUserInformation , showMenu, setShowMenu } = useContext(UserContext)
+    const { userInformation, setUserInformation , showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext)
     const avatar = (!!userInformation) ? userInformation.user.avatar : ''
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState(null);
-    const [followingUsers, setFollowingUsers] = useState([]);
     const history = useHistory()
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
@@ -100,7 +99,6 @@ export default function Timeline(){
             setIsPublishing(false)
             setNewPostLink('')
             setNewPostComment('')
-            
         })
         request.catch(() => {
             alert("Houve um erro ao publicar seu link")
@@ -110,7 +108,7 @@ export default function Timeline(){
 
     return(
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
-            <Header/>
+            <Header />
             <Title>timeline</Title>
             <Content>
                 <Posts>
@@ -131,7 +129,7 @@ export default function Timeline(){
                     : showPosts()}
 
                 </Posts>
-                <Hashtags token={userInformation.token}/>
+                <Hashtags token={token}/>
             </Content>
               
         </TimelinePage>

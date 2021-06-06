@@ -18,7 +18,6 @@ export default function Hashtags(props){
         const requestPromise = axios.get(url, config);
         requestPromise.then((response)=>{
             setHashtaghs(response.data.hashtags);
-            console.log(response.data);
         })
     }, []);
 
