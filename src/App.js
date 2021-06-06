@@ -10,6 +10,7 @@ import {BrowserRouter, Route, Switch } from 'react-router-dom';
 import GlobalStyle from './components/utils/GlobalStyle';
 import { useState } from 'react'
 import UserContext from './components/contexts/UserContext'
+import HashtagPage from './components/Hashtags/HashtagPage';
 
 export default function App() {
   const [ userInformation, setUserInformation ] = useState(null)
@@ -28,6 +29,9 @@ export default function App() {
           </Route>
           <Route path="/timeline" exact >
             <Timeline/>
+          </Route>
+          <Route path="/hashtag/:hashtag" exact>
+            <HashtagPage/>
           </Route>
           <Route path="/my-posts" exact={true}>
             <MyPosts/>
