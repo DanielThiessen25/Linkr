@@ -6,7 +6,8 @@ import axios from 'axios'
 import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
-import useInterval from 'react-useinterval'
+import useInterval from 'react-useinterval';
+import { IoLocationOutline } from 'react-icons/io5';
 
 export default function Timeline(){
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -15,6 +16,11 @@ export default function Timeline(){
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState(null);
+    const [geoAllowed, setGeoAllowed] = useState(false);
+    const [geoLocation, setGeoLocation] = useState({
+        latitude: "",
+        longitude: ""
+    });
 
     const [followingUsers, setFollowingUsers] = useState([]);
 
@@ -41,6 +47,7 @@ export default function Timeline(){
         const requisicao = axios.get(url, config);
         requisicao.then(resposta => {
             setListPosts([...resposta.data.posts]);
+            console.log(resposta.data)
         });
         requisicao.catch(err =>{
             alert(err);
@@ -72,13 +79,17 @@ export default function Timeline(){
             return
         }
         setIsPublishing(true)
-        const body = { text: newPostComment , link: newPostLink }
+        let body = { text: newPostComment , link: newPostLink }
+        if(geoAllowed){
+            body.geolocalization = geoLocation;
+        }
         const config = {
             headers: {
                 "Authorization": `Bearer ${userInformation.token}`
             } 
         }
-        const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", body, config)
+        const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts";
+        const request = axios.post(url, body, config);
         request.then(reply => {
             alert("post publicado com sucesso!")
             setIsPublishing(false)
@@ -89,6 +100,30 @@ export default function Timeline(){
             alert("Houve um erro ao publicar seu link")
             setIsPublishing(false)
         })
+    }
+
+
+    function handleGeolocatization(){
+        setGeoAllowed(!geoAllowed);
+        if(geoAllowed){
+            return;
+        }
+        if(!("geolocation" in navigator)){
+            window.alert('Não foi possível obter sua localização');
+            setGeoAllowed(false);
+            return;
+        }
+        navigator.geolocation.getCurrentPosition((position)=>{
+            const coords = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+            }
+            setGeoLocation({...coords})
+        }, (err)=>{
+            window.alert('Não foi possível obter sua localização');
+            setGeoAllowed(false);
+        })
+
     }
 
     return(
@@ -105,7 +140,15 @@ export default function Timeline(){
                             <CreatePostTitle>O que você tem pra favoritar hoje?</CreatePostTitle>
                             <input disabled={isPublishing} className="link" type="text" placeholder="http://..." value={newPostLink} onChange={e => setNewPostLink(e.target.value)} />
                             <textarea disabled={isPublishing} className="comment" placeholder="Muito irado esse link falando de #javascript" value={newPostComment} onChange={e => setNewPostComment(e.target.value)} />
-                            <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
+                            <div>
+                                <LocationStyle
+                                geoAllowed={geoAllowed} 
+                                onClick={handleGeolocatization}>
+                                    <IoLocationOutline color={geoAllowed ? '#238700': '#949494'}/>
+                                    <p>Localização {geoAllowed ? 'ativada' : 'desativada'}</p>
+                                </LocationStyle>
+                                <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
+                            </div>
                         </NewPostInformations>
                     </CreatePost>
                     {getFollowingUsers()}
@@ -210,10 +253,22 @@ const NewPostInformations = styled.div`
         background: #1877F2;
         border-radius: 5px;
         border: none;
-        margin-left: calc(100% - 112px);
+
         font-weight: bold;
         font-size: 14px;
         color: #FFFFFF;
         cursor: pointer;
     }
-`
+    div{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+`;
+
+const LocationStyle = styled.div`
+    p{
+        font-size: 13px;
+        color: ${props => props.geoAllowed ? '#238700': '#949494'}
+    }
+`;

@@ -6,6 +6,7 @@ import ReactTooltip from 'react-tooltip';
 import LinkDialog from './LinkDialog';
 import getYoutubeID from 'get-youtube-id';
 import Youtube from 'react-youtube';
+import { IoLocationSharp } from 'react-icons/io5';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
@@ -69,11 +70,9 @@ export default function Post(props) {
                 sentence = "Você";
             }
             else if(likes === 2){
-                console.log(props.object.likes);
                 sentence = "Você e" + props.object.likes[1].username;
             }
             else if(likes == 3){
-                console.log(props.object.likes);
                 sentence = "Você,"+ props.object.likes[1].username + " e outras" + (props.object.likes.length - 1) + "pessoas";
             }
             
@@ -102,7 +101,13 @@ export default function Post(props) {
                 <ReactTooltip type="light" place="bottom"/>
             </VerticalSelector>
             <Text>
-                <Name>{props.object.user.username}</Name>
+                <UserLineInfo>
+                    <Name>{props.object.user.username}</Name>
+                    <GeoIconContainer>
+                        <IoLocationSharp color={'#FFFFFF'} size={'20px'}/>
+                    </GeoIconContainer>   
+                </UserLineInfo>
+                
                 <Message>{string}
                 {hashtags.map(item => 
                 <h5>{"#"+ item + " "}</h5>
@@ -155,7 +160,7 @@ const Text = styled.div`
 `;
  
 const Name = styled.div`
-    font-family: Lato;
+    font-family: 'Lato';
     font-style: normal;
     font-weight: normal;
     font-size: 19px;
@@ -269,4 +274,13 @@ const Picture = styled.div`
         border-radius: 0px 12px 13px 0px;
     }
     
+`;
+
+const UserLineInfo = styled.div`
+    display: flex;
+    align-items: center;
+`;
+
+const GeoIconContainer = styled.div`
+    margin-left: 20px;
 `;
