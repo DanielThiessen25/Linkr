@@ -18,21 +18,23 @@ export default function LinkDialog(props){
 }
 
 const EntirePage = styled.div`
-    position: absolute;
-    left: 0;
+    position: fixed;
+    left: 0 !important;
+    top: 0 !important;
+    bottom: 0;
     right: 0;
-    top: 0;
     background: rgba(255, 255, 255, 0.9);
-    z-index: 2;
+    z-index: 7;
     display: flex;
     justify-content: center;
     padding-top: 63px;
     padding-bottom: 57px;
+    overflow-y: scroll;
 `;
 
 const DialogBox = styled.div`
     width: 966px;
-    height: 904px;
+    max-height: 904px;
     background: #333333;
     border-radius: 20px;
     display: flex;
