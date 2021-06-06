@@ -8,6 +8,7 @@ import ReactTooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import { AiOutlineComment } from "react-icons/ai";
 import { CgRepeat } from "react-icons/cg";
+import LinkDialog from './LinkDialog';
 import getYoutubeID from 'get-youtube-id';
 import Youtube from 'react-youtube';
 
@@ -23,6 +24,7 @@ export default function Post(props) {
     const [clickRepost, setClickRepost]= useState(false);
     const [inputComment, setInputComment] = useState("");
     const [isReposted, setIsReposted] = useState(false);
+    const [linkToDialog, setLinkToDialog] = useState(false);
     const [youtubeLinkPost, setYoutubeLinkPost] = useState(false);
 
 
@@ -215,46 +217,49 @@ export default function Post(props) {
         setInputComment("");
     }
 
+    if(linkToDialog){
+        return(
+            <LinkDialog link={props.object.link} setDialogState={setLinkToDialog}/>
+        );
+    }
+
 return (
     <PostContainer>
         {showReposts()}
-    <Box isYoutubeLink={youtubeLinkPost}>
-        <VerticalSelector>
-            <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
-            {printLikes()}
-            <Option data-tip={showLikes()}>{likes} likes</Option>
-            <ReactTooltip type="light" place="bottom" />
-            <Option><button onClick={()=> setClickComment(!clickComment)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Option>
-            <Option><button onClick={()=> setClickRepost(true)}><CgRepeat size="2.5em" color="#FFFFFF" /></button><p>{props.object.repostCount + " re-posts"}</p></Option>
-        </VerticalSelector>
-        <Text>
-            <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
-            <Message>{string}
-                {hashtags.map(item =>
-                    <h5>{"#" + item + " "}</h5>
-                )}
-
-            </Message>
+        <Box isYoutubeLink={youtubeLinkPost}>
+            <VerticalSelector>
+                <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
+                {printLikes()}
+                <Option data-tip={showLikes()}>{likes} likes</Option>
+                <ReactTooltip type="light" place="bottom" />
+                <Option><button onClick={()=> setClickComment(!clickComment)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Option>
+                <Option><button onClick={()=> setClickRepost(true)}><CgRepeat size="2.5em" color="#FFFFFF" /></button><p>{props.object.repostCount + " re-posts"}</p></Option>
+            </VerticalSelector>
+            <Text>
+                <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
+                <Message>{string}
+                    {hashtags.map(item =>
+                        <h5>{"#" + item + " "}</h5>
+                    )}
+                </Message>
             { youtubeLinkPost ? 
                     <><Youtube videoId={getYoutubeID(props.object.link)}/>
-                    <p>{props.object.link}</p></>
-                : 
-            <a href={props.object.link} target="_blank" rel="noopener noreferrer"><Bookmark>
-                <Picture><img src={props.object.linkImage} /></Picture>
-                <Info>
-                    <h2>{props.object.linkTitle}</h2>
-                    <h3>{props.object.linkDescription}</h3>
-                    <h4>{props.object.link}</h4>
-                </Info>
-
-            </Bookmark>
-            </a>}
-        </Text>
-
-    </Box>
-    {showComments()}
+                    <p onClick={()=>setLinkToDialog(true)}>{props.object.link}</p></>
+                : <Bookmark onClick={()=>setLinkToDialog(true)}>
+                    <Picture><img src={props.object.linkImage} /></Picture>
+                    <Info>
+                        <h2>{props.object.linkTitle}</h2>
+                        <h3>{props.object.linkDescription}</h3>
+                        <h4>{props.object.link}</h4>
+                    </Info>
+                    
+                </Bookmark>}
+            </Text>
+            
+        </Box>
+        {showComments()}
     </PostContainer>
-);
+    );
 }
 
 const PostContainer = styled.div`
