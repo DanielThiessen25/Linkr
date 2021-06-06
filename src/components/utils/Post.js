@@ -3,7 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
+<<<<<<< HEAD
 import { Link } from 'react-router-dom';
+=======
+import LinkDialog from './LinkDialog';
+>>>>>>> master
 import getYoutubeID from 'get-youtube-id';
 import Youtube from 'react-youtube';
 
@@ -13,6 +17,7 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
+    const [linkToDialog, setLinkToDialog] = useState(false);
     const [youtubeLinkPost, setYoutubeLinkPost] = useState(false);
 
     useEffect(() => {
@@ -104,6 +109,11 @@ export default function Post(props) {
         );
     }
     
+    if(linkToDialog){
+        return(
+            <LinkDialog link={props.object.link} setDialogState={setLinkToDialog}/>
+        );
+    }
 
 return (
     <Box isYoutubeLink={youtubeLinkPost}>
@@ -119,25 +129,23 @@ return (
                 {hashtags.map(item =>
                     <h5>{"#" + item + " "}</h5>
                 )}
-
             </Message>
             { youtubeLinkPost ? 
                     <><Youtube videoId={getYoutubeID(props.object.link)}/>
-                    <p>{props.object.link}</p></>
-                :<a href={props.object.link} target="_blank" rel="noopener noreferrer"><Bookmark>
-                <Picture><img src={props.object.linkImage} /></Picture>
-                <Info>
-                    <h2>{props.object.linkTitle}</h2>
-                    <h3>{props.object.linkDescription}</h3>
-                    <h4>{props.object.link}</h4>
-                </Info>
-
-            </Bookmark>
-            </a>}
-        </Text>
-
-    </Box>
-);
+                    <p onClick={()=>setLinkToDialog(true)}>{props.object.link}</p></>
+                : <Bookmark onClick={()=>setLinkToDialog(true)}>
+                    <Picture><img src={props.object.linkImage} /></Picture>
+                    <Info>
+                        <h2>{props.object.linkTitle}</h2>
+                        <h3>{props.object.linkDescription}</h3>
+                        <h4>{props.object.link}</h4>
+                    </Info>
+                    
+                </Bookmark>}
+            </Text>
+            
+        </Box>
+    );
 }
 
 const Box = styled.div`

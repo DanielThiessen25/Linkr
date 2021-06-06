@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
 import Loader from 'react-loader-spinner'
 
+import useInterval from 'react-useinterval'
 
 export default function Timeline(){
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -48,6 +49,8 @@ export default function Timeline(){
             alert(err);
         })
     }
+
+    useInterval(loadPosts, 15000, 15000)
 
     useEffect(() => {
         loadPosts();
