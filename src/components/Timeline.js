@@ -21,6 +21,7 @@ export default function Timeline(){
         latitude: "",
         longitude: ""
     });
+    
 
     const [followingUsers, setFollowingUsers] = useState([]);
 

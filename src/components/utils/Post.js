@@ -7,6 +7,7 @@ import LinkDialog from './LinkDialog';
 import getYoutubeID from 'get-youtube-id';
 import Youtube from 'react-youtube';
 import { IoLocationSharp } from 'react-icons/io5';
+import GeoDialog from './GeoDialog';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
@@ -16,6 +17,7 @@ export default function Post(props) {
     const [likes, setLikes] = useState(props.object.likes.length);
     const [linkToDialog, setLinkToDialog] = useState(false);
     const [youtubeLinkPost, setYoutubeLinkPost] = useState(false);
+    const [linkGeoDialog, setLinkGeoDialog] = useState(false);
 
     useEffect(() => {
         for(let i = 0; i < props.object.likes.length; i++){
@@ -89,6 +91,11 @@ export default function Post(props) {
     if(linkToDialog){
         return(
             <LinkDialog link={props.object.link} setDialogState={setLinkToDialog}/>
+        );
+    }
+    if(linkGeoDialog){
+        return(
+            <GeoDialog  setDialogState={setLinkGeoDialog}/>
         );
     }
 
