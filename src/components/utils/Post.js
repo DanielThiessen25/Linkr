@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
+import Modal from 'react-modal';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
@@ -10,7 +11,25 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
+    const [ modalIsOpen, setIsOpen ] = useState(false);
 
+    const modalStyles = {
+        content : {
+            'width': '42%',
+            'height': '28%',   
+            'top': 'calc(50% - 12.5%)',
+            'left': 'calc(30%)',
+            'backgroundColor': '#333333',
+            'borderRadius': '50px',
+            'fontFamily': 'font-family: Lato',
+            'fontWeight': 'bold',
+            'display': 'flex',
+            'flexDirection': 'column',
+            'justifyContent': 'center',
+            'alignItems': 'center',
+        }
+      };
+    
     useEffect(() => {
         for(let i = 0; i < props.object.likes.length; i++){
             if(props.object.likes[i].userId === props.id){
@@ -77,8 +96,25 @@ export default function Post(props) {
         );
     }
 
+    function deletePost(){
+        const config = {
+            headers: {
+                Authorization: `Bearer ${props.token}`
+            }
+        }
+        const request = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/${props.object.id}`, config)
+        request.then(reply => {
+            const listPosts = props.listPosts
+            const filteredPosts = listPosts.filter(post => post.id !== props.object.id)
+            props.setListPosts([...filteredPosts])
+        })
+        request.catch(() => alert("Post was not possible to be deleted"))
+    }
+
+    
+
     return (
-        <Box>
+        <Box >
             <VerticalSelector>
                 <Avatar><img src={props.object.user.avatar} /></Avatar>
                 {printLikes()}
@@ -88,8 +124,8 @@ export default function Post(props) {
             <Text>
                 <Name>{props.object.user.username}</Name>
                 <Message>{string}
-                {hashtags.map(item => 
-                <h5>{"#"+ item + " "}</h5>
+                {hashtags.map((item,i) => 
+                <h5 key={i}>{"#"+ item + " "}</h5>
                 )}
                 
                 </Message>
@@ -103,7 +139,20 @@ export default function Post(props) {
                     
                 </Bookmark> 
             </Text>
-            
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => setIsOpen(false)}
+                style={modalStyles}
+                >
+                    <ModalTitle>Tem certeza que deseja excluir essa publicação?</ModalTitle>
+                    <Buttons>
+                        <CloseButton onClick={e => {e.stopPropagation()
+                                                    setIsOpen(false)
+                                                    }}>Não, voltar</CloseButton>
+                        <ConfirmButton onClick={deletePost}>Sim, excluir</ConfirmButton>
+                    </Buttons>
+                    
+            </Modal>
         </Box>
     );
 }
@@ -242,3 +291,63 @@ const Picture = styled.div`
     }
     
 `;
+
+const ModalTitle = styled.div`
+    font-size: 34px;
+    line-height: 41px;
+    color: #FFFFFF;
+    text-align: center;
+    width: 70%;
+    @media(max-width: 600px){
+        font-size: 18px;
+    }
+
+`
+
+const Buttons = styled.div`
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-evenly;
+    margin-top: 20px;
+    padding: 0 50px;
+    @media(max-width: 600px){
+        padding: 0 20px;
+    }
+`
+
+const ConfirmButton = styled.div`
+    width: 134px;
+    height: 37px;
+    color: #FFFFFF;
+    border-radius: 5px;
+    background-color: #1877F2;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    @media(max-width: 600px){
+        width: 70px;
+        height: 20px;
+        font-size: 10px;
+    }
+`
+
+const CloseButton = styled.div`
+    width: 134px;
+    height: 37px;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    font-size: 18px;
+    color: #1877F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    @media(max-width: 600px){
+        width: 70px;
+        height: 20px;
+        font-size: 10px;
+    }
+`

@@ -16,6 +16,7 @@ export default function MyPosts() {
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
 
+
     checkIfLogged();
     function checkIfLogged(){
         if(!!information){
@@ -51,7 +52,7 @@ export default function MyPosts() {
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
-                        <Post object={item} token={token} id={id}/>
+                        <Post object={item} key={item.id} token={token} id={id} listPosts={listPosts} setListPosts={setListPosts}  />
                     )
             );
         }
