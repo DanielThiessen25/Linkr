@@ -3,11 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
-<<<<<<< HEAD
 import { Link } from 'react-router-dom';
-=======
 import LinkDialog from './LinkDialog';
->>>>>>> master
 import getYoutubeID from 'get-youtube-id';
 import Youtube from 'react-youtube';
 

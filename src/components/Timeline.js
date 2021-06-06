@@ -16,7 +16,7 @@ export default function Timeline(){
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
-    const [listPosts, setListPosts] = useState();
+    const [listPosts, setListPosts] = useState(null);
     const [isError, setIsError] = useState(false);
 
     const [followingUsers, setFollowingUsers] = useState([]);
