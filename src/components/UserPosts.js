@@ -24,7 +24,7 @@ export default function UserPosts() {
             }
         }
         const requestNome = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/"+ idUser.id, config);
-        requestNome.then((resposta)=>setName(resposta.user.username));
+        requestNome.then(resposta => setName(resposta.data.user.username));
         const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + idUser.id + "/posts", config);
         request.then(resposta => {
             setListPosts([...resposta.data.posts]);
@@ -58,17 +58,8 @@ export default function UserPosts() {
         }
     }
 
-    function loadTitle(){
-        if(listPosts != null){
-            return(
-                listPosts[0].user.username + "'s posts"
-            );
-        }
-        
-    }
-
     return (
-        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
+        <UserPostsPage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
             <Title>{name}</Title>
             <Content>
@@ -79,23 +70,30 @@ export default function UserPosts() {
 
             <Hashtags token={userInformation.token}/>
             </Content>
-
-        </TimelinePage>
+        </UserPostsPage>
 
     );
 
 }
 
-const TimelinePage = styled.div`
+const UserPostsPage = styled.div`
     padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
+    @media(max-width: 600px){
+        width: 100%;
+        padding: 125px 0px 0 0px;
+    }
+    
 `
 
 const Posts = styled.div`
     width: 65%;
     display: flex;
     flex-direction: column;
+    @media(max-width: 600px){
+        width: 100%;
+    }
     
 `
 
@@ -106,6 +104,9 @@ const Title = styled.div`
     font-weight: bold;
     font-size: 43px;
     margin-bottom: 45px;
+    @media(max-width: 600px){
+        padding-left:20px;
+    }
 `
 
 const Content = styled.div`

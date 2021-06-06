@@ -54,7 +54,7 @@ export default function MyPosts() {
     }
 
     return (
-        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
+        <MyPostsPage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
             <Title>my posts</Title>
             <Content>
@@ -66,23 +66,29 @@ export default function MyPosts() {
             <Hashtags token={userInformation.token}/>
             </Content>
 
-        </TimelinePage>
+        </MyPostsPage>
 
     );
 
 }
 
-const TimelinePage = styled.div`
+const MyPostsPage = styled.div`
     padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
+    @media(max-width: 600px){
+        width: 100%;
+        padding: 125px 0px 0 0px;
+    }
 `
 
 const Posts = styled.div`
     width: 65%;
     display: flex;
     flex-direction: column;
-    
+    @media(max-width: 600px){
+        width: 100%;
+    }
 `
 
 const Title = styled.div`
@@ -92,6 +98,9 @@ const Title = styled.div`
     font-weight: bold;
     font-size: 43px;
     margin-bottom: 45px;
+    @media(max-width: 600px){
+        padding-left:20px;
+    }
 `
 
 const Content = styled.div`
