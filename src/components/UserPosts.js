@@ -7,7 +7,7 @@ import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
-import { useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import Loader from 'react-loader-spinner'
 
 export default function UserPosts() {
@@ -16,8 +16,12 @@ export default function UserPosts() {
     const  idUser  = useParams();
     const [name, setName] = useState("");
     const [isError, setIsError] = useState(false);
+    const history = useHistory();
 
     function loadPosts(){
+        if(!userInformation){
+            return;
+        }
         const config = {
             headers: {
                 Authorization: `Bearer ${userInformation.token}`
@@ -37,6 +41,9 @@ export default function UserPosts() {
     }, []);
 
     function showPosts() {
+        if(!userInformation){
+            return;
+        }
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
@@ -66,7 +73,9 @@ export default function UserPosts() {
         }
         
     }
-
+    if(!userInformation){
+        history.push("/");
+    }
     return (
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
@@ -77,7 +86,9 @@ export default function UserPosts() {
             </Posts>
             
 
+            { userInformation ?
             <Hashtags token={userInformation.token}/>
+            : ''}
             </Content>
 
         </TimelinePage>

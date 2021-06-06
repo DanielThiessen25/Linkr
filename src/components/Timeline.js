@@ -9,6 +9,7 @@ import Hashtags from "./Hashtags/Hashtags";
 import Loader from 'react-loader-spinner'
 
 import useInterval from 'react-useinterval'
+import { useHistory } from 'react-router'
 
 export default function Timeline(){
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -18,10 +19,14 @@ export default function Timeline(){
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState(null);
     const [isError, setIsError] = useState(false);
+    const history = useHistory();
 
     const [followingUsers, setFollowingUsers] = useState([]);
 
     function getFollowingUsers(){
+        if(!userInformation){
+            return;
+        }
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/follows";
         const config = {
             headers: {
@@ -35,6 +40,9 @@ export default function Timeline(){
     }
 
     function loadPosts(){
+        if(!userInformation){
+            return;
+        }
         const config = {
             headers: {
                 Authorization: `Bearer ${userInformation.token}`
@@ -108,6 +116,11 @@ export default function Timeline(){
         })
     }
 
+    if(!userInformation){
+        history.push("/");
+    }
+
+
     return(
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header/>
@@ -131,7 +144,9 @@ export default function Timeline(){
                     : showPosts()}
 
                 </Posts>
+                {userInformation ? 
                 <Hashtags token={userInformation.token}/>
+                : ''}
             </Content>
               
         </TimelinePage>

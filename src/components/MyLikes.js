@@ -8,14 +8,19 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
 import Loader from 'react-loader-spinner'
+import { useHistory } from 'react-router';
 
 
 export default function MyLikes() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
     const [isError, setIsError] = useState(false);
+    const history = useHistory();
 
     function loadPosts(){
+        if(!userInformation){
+            return;
+        }
         const config = {
             headers: {
                 Authorization: `Bearer ${userInformation.token}`
@@ -32,7 +37,14 @@ export default function MyLikes() {
         loadPosts();
     }, []);
 
+
+    if(!userInformation){
+        history.push("/");
+    }
     function showPosts() {
+        if(!userInformation){
+            return;
+        }
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
@@ -63,8 +75,9 @@ export default function MyLikes() {
             {showPosts()}
             </Posts>
             
-
+            {userInformation ?
             <Hashtags token={userInformation.token}/>
+            : ''}
             </Content>
 
         </TimelinePage>
