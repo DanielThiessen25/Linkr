@@ -17,6 +17,8 @@ export default function UserPosts() {
     const [name, setName] = useState("");
     const [isError, setIsError] = useState(false);
     const history = useHistory();
+    const [isFollow, setIsFollow] = useState(false);
+    const [clickFollow, setClickFollow] = useState(false);
 
     function loadPosts(){
         if(!userInformation){
@@ -38,7 +40,24 @@ export default function UserPosts() {
 
     useEffect(() => {
         loadPosts();
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/follows", config);
+        request.then(checkFollowed);
     }, []);
+
+
+    function checkFollowed(resposta){
+        for(let i=0; i<resposta.data.users.length; i++){
+            if(resposta.data.users[i].id == idUser.id){
+                setIsFollow(true);
+            }
+        }
+        
+    }
 
     function showPosts() {
         if(!userInformation){
@@ -64,27 +83,49 @@ export default function UserPosts() {
             );
         }
     }
-
-    function loadTitle(){
-        if(listPosts != null){
-            return(
-                listPosts[0].user.username + "'s posts"
-            );
-        }
-        
-    }
     if(!userInformation){
         history.push("/");
     }
+
+    function publishFollow(){
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+
+
+        if(isFollow == false){
+            setClickFollow(true);
+            const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + idUser.id + "/follow", {}, config);
+            request.then(()=>{
+                setClickFollow(false);
+                setIsFollow(true);
+                
+            });
+        }
+        else{
+            setClickFollow(true);
+            const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + idUser.id + "/unfollow", {}, config);
+            request.then(()=>{
+                setClickFollow(false);
+                setIsFollow(false);
+            });
+        }
+        
+        
+    }
+
     return (
         <UserPostsPage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
-            <Title>{name}</Title>
+            <Title>{name+"'s posts"}
+            <button disabled={clickFollow} onClick={publishFollow}>{(isFollow) ? <Unfollow>UnFollow</Unfollow> : <Follow>Follow</Follow>}</button>
+            </Title>
             <Content>
             <Posts>
             {showPosts()}
             </Posts>
-            
 
             { userInformation ?
             <Hashtags token={userInformation.token}/>
@@ -124,10 +165,44 @@ const Title = styled.div`
     font-weight: bold;
     font-size: 43px;
     margin-bottom: 45px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     @media(max-width: 600px){
         padding-left:20px;
     }
+    button{
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: Lato;
+        font-style: normal;
+        font-weight: bold;
+        font-size: 14px;
+        line-height: 17px;
+    }
 `
+const Unfollow = styled.div`
+        width: 112px;
+        height: 31px;
+        border-radius: 5px;         
+        background: #FFFFFF;
+        color: #1877F2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+`;
+const Follow = styled.div`
+        width: 112px;
+        height: 31px;
+        border-radius: 5px;
+        background: #1877F2;
+        color: #FFFFFF;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+`;
 
 const Content = styled.div`
     display: flex;
