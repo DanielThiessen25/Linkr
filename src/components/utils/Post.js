@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
+import getYoutubeID from 'get-youtube-id';
+import Youtube from 'react-youtube';
 
 export default function Post(props) {
     let description = props.object.text+ "#teste";
@@ -10,6 +12,7 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
+    const [youtubeLinkPost, setYoutubeLinkPost] = useState(false);
 
     useEffect(() => {
         for(let i = 0; i < props.object.likes.length; i++){
@@ -18,6 +21,11 @@ export default function Post(props) {
             }
         }  
     }, []);
+    useEffect(()=>{
+        if(getYoutubeID(props.object.link) !== null){
+            setYoutubeLinkPost(true);
+        }
+    })
 
     function printLikes(){
         if(liked === true){
@@ -78,7 +86,7 @@ export default function Post(props) {
     }
 
     return (
-        <Box>
+        <Box isYoutubeLink={youtubeLinkPost}>
             <VerticalSelector>
                 <Avatar><img src={props.object.user.avatar} /></Avatar>
                 {printLikes()}
@@ -93,15 +101,18 @@ export default function Post(props) {
                 )}
                 
                 </Message>
-                <Bookmark>
-                <Picture><img src={props.object.linkImage} /></Picture>
+                { youtubeLinkPost ? 
+                    <><Youtube videoId={getYoutubeID(props.object.link)}/>
+                    <p>{props.object.link}</p></>
+                : <Bookmark>
+                    <Picture><img src={props.object.linkImage} /></Picture>
                     <Info>
                         <h2>{props.object.linkTitle}</h2>
                         <h3>{props.object.linkDescription}</h3>
                         <h4>{props.object.link}</h4>
                     </Info>
                     
-                </Bookmark> 
+                </Bookmark>}
             </Text>
             
         </Box>
@@ -110,7 +121,7 @@ export default function Post(props) {
 
 const Box = styled.div`
 width: 100%;
-height: 276px;
+height: ${props => props.isYoutubeLink ? '433px': '276px'};
 margin-bottom: 16px;
 background: #171717;
 border-radius: 16px;
@@ -124,6 +135,15 @@ const Text = styled.div`
     margin-left: 18px;
     display: flex;
     flex-direction:column;
+    iframe{
+        height: 281px;
+        width: 100%;
+        margin-bottom: 6px;
+    }
+    p{
+        color: #B7B7B7;
+        font-size: 17px;
+    }
 `;
  
 const Name = styled.div`
