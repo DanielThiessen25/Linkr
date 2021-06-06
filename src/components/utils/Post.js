@@ -8,6 +8,8 @@ import ReactTooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import { AiOutlineComment } from "react-icons/ai";
 import { CgRepeat } from "react-icons/cg";
+import getYoutubeID from 'get-youtube-id';
+import Youtube from 'react-youtube';
 
 export default function Post(props) {
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext);
@@ -21,7 +23,7 @@ export default function Post(props) {
     const [clickRepost, setClickRepost]= useState(false);
     const [inputComment, setInputComment] = useState("");
     const [isReposted, setIsReposted] = useState(false);
-
+    const [youtubeLinkPost, setYoutubeLinkPost] = useState(false);
 
 
     const config = {
@@ -48,6 +50,11 @@ export default function Post(props) {
         }
 
     }, []);
+    useEffect(()=>{
+        if(getYoutubeID(props.object.link) !== null){
+            setYoutubeLinkPost(true);
+        }
+    })
 
     function printLikes() {
         if (liked === true) {
@@ -211,7 +218,7 @@ export default function Post(props) {
 return (
     <PostContainer>
         {showReposts()}
-    <Box>
+    <Box isYoutubeLink={youtubeLinkPost}>
         <VerticalSelector>
             <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
             {printLikes()}
@@ -228,6 +235,10 @@ return (
                 )}
 
             </Message>
+            { youtubeLinkPost ? 
+                    <><Youtube videoId={getYoutubeID(props.object.link)}/>
+                    <p>{props.object.link}</p></>
+                : 
             <a href={props.object.link} target="_blank" rel="noopener noreferrer"><Bookmark>
                 <Picture><img src={props.object.linkImage} /></Picture>
                 <Info>
@@ -237,7 +248,7 @@ return (
                 </Info>
 
             </Bookmark>
-            </a>
+            </a>}
         </Text>
 
     </Box>
@@ -254,7 +265,8 @@ const PostContainer = styled.div`
 
 const Box = styled.div`
 width: 100%;
-height: 276px;
+height: ${props => props.isYoutubeLink ? '433px': '276px'};
+margin-bottom: 16px;
 background: #171717;
 border-radius: 16px;
 display: flex;
@@ -268,6 +280,15 @@ const Text = styled.div`
     margin-left: 18px;
     display: flex;
     flex-direction:column;
+    iframe{
+        height: 281px;
+        width: 100%;
+        margin-bottom: 6px;
+    }
+    p{
+        color: #B7B7B7;
+        font-size: 17px;
+    }
 `;
 
 const Name = styled.div`
