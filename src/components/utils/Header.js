@@ -60,7 +60,7 @@ const Navbar = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    z-index: 1;
+    z-index: 5;
 `
 
 const Logo = styled.div`
