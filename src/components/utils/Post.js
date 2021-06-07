@@ -429,6 +429,9 @@ const Text = styled.div`
         color: #4C4C4C;
         font-family: Lato;
         z-index: ${props => props.toEditPost ? '2' : '-1'};
+        ${props => props.toEditPost ?
+        '': 'display: none;'
+        }
     }
     iframe{
         height: 281px;
