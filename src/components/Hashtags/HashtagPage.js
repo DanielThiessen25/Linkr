@@ -93,12 +93,12 @@ export default function HashtagPage(){
             <Header/>
             <Title># {hashtag}</Title>
             <Content>
-            <InfiniteScroll
+                <Posts>
+                <InfiniteScroll
                             pageStart={0}
                             hasMore={isMore}
                             loadMore={loadMorePosts}
                             threshold={0}>
-                        <Posts>
                             {getHashtagPosts()}
                             {posts.length === 0 ?
                                 <h2>Carregando posts dessa hashtag</h2>
@@ -111,8 +111,9 @@ export default function HashtagPage(){
                                     );
                             })
                             }
-                        </Posts>
                 </InfiniteScroll>
+                </Posts>
+                
                 {userInformation ?
                 <Hashtags token={userInformation.token}/>
                 : ''}
