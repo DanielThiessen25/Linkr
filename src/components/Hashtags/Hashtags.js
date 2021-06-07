@@ -71,6 +71,9 @@ const HashTagStyles = styled.div`
         font-size: 27px;
         color: #FFFFFF;
     }
+    @media(max-width: 600px){
+        display: none;
+    }
 `;
 const Title = styled.div`
     padding-left: 16px;

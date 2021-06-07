@@ -157,6 +157,10 @@ export const TimelinePage = styled.div`
     padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
+    @media(max-width: 600px){
+        width: 100%;
+        padding: 125px 0px 0 0px;
+    }
 `
 export const Content = styled.div`
     display: flex;
@@ -171,10 +175,29 @@ export const Title = styled.div`
     font-weight: bold;
     font-size: 43px;
     margin-bottom: 45px;
+    @media(max-width: 600px){
+        padding-left:20px;
+    }
 `
 export const Posts = styled.div`
     width: 65%;
-    
+
+    h2{
+        color: #ffffff;
+    }
+
+    @media(max-width: 600px){
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h2{
+            width: 80%;
+        }
+    }
+
+
 `
 
 const CreatePost = styled.div`
@@ -185,6 +208,13 @@ const CreatePost = styled.div`
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 16px;
     font-family: 'Lato', sans-serif;
+    @media(max-width: 600px){
+        width: 100%;
+        border-radius: 0px;
+        flex-direction: column;
+        align-items: center;
+    }
+    
 `
 const UserPicture = styled.div`
     padding: 18px 16px;
@@ -193,6 +223,9 @@ const UserPicture = styled.div`
         height: 50px;
         border-radius: 50%;
     }
+    @media(max-width: 600px){
+        display: none;
+    }
 
 `
 const CreatePostTitle = styled.div`
@@ -200,6 +233,10 @@ const CreatePostTitle = styled.div`
     font-size: 20px;
     color: #707070;
     margin-bottom: 15px;
+    @media(max-width: 600px){
+        text-align: center;
+    }
+    
 `
 const NewPostInformations = styled.div`
     width: 100%;
@@ -247,6 +284,14 @@ const NewPostInformations = styled.div`
         font-size: 14px;
         color: #FFFFFF;
         cursor: pointer;
+    }
+
+
+    @media(max-width: 600px){
+        width: 90%;
+        flex-direction: column;
+        align-items: center;
+        padding:20px 0px 16px 0px;
     }
 `
 

@@ -270,7 +270,7 @@ const PostContainer = styled.div`
 
 const Box = styled.div`
 width: 100%;
-height: ${props => props.isYoutubeLink ? '433px': '276px'};
+min-height: ${props => props.isYoutubeLink ? '433px': '276px'};
 margin-bottom: 16px;
 background: #171717;
 border-radius: 16px;
@@ -278,6 +278,11 @@ display: flex;
 flex-direction: row;
 padding: 20px;
 z-index: 2;
+
+@media(max-width: 600px){
+    min-height: ${props => props.isYoutubeLink ? '433px': '230px'};
+    border-radius: 0px;
+    }
 `;
 
 const Text = styled.div`
@@ -303,6 +308,11 @@ const Name = styled.div`
     font-size: 19px;
     line-height: 23px;
     color: #FFFFFF;
+
+    @media(max-width: 600px){
+    font-size: 17px;
+    line-height: 20px;
+    }
 
 `;
 
@@ -331,6 +341,12 @@ const Avatar = styled.div`
         height: 100%;
         border-radius: 26.5px;
     }
+
+    @media(max-width: 600px){
+        width: 40px;
+        height: 40px;
+    }
+    
 `;
 
 
@@ -347,6 +363,10 @@ color: #FFFFFF;
 display: flex;
 flex-direction: column;
 align-items: center;
+@media(max-width: 600px){
+    font-size: 9px;
+    line-height: 11px;
+    }
 `;
 
 const Message = styled.div`
@@ -358,12 +378,17 @@ color: #B7B7B7;
 margin-top: 10px;
 margin-bottom: 10px;
 display: flex;
+flex-wrap: wrap;
 flex-direction: row;
 h5{
     margin-left: 9px;
     color: white;
 }
+@media(max-width: 600px){
+    font-size: 15px;
+    line-height: 18px;
 
+    }
 `;
 
 const Bookmark = styled.div`
@@ -376,6 +401,10 @@ const Bookmark = styled.div`
     position: relative;
     display: flex;
     align-items: center;
+    @media(max-width: 600px){
+        padding-left: 10px;
+    height: 115px;
+    }
 `;
 
 const Info = styled.div`
@@ -403,6 +432,22 @@ const Info = styled.div`
     font-size: 11px;
     line-height: 13px;
     color: #CECECE;
+    }
+
+    @media(max-width: 600px){
+        h2{
+    font-size: 11px;
+    line-height: 13px;
+    }
+    h3{
+    font-size: 9px;
+    line-height:11px;
+
+    }
+    h4{
+    font-size: 9px;
+    line-height: 11px;
+    }
     }
 `;
 
@@ -451,6 +496,9 @@ const RepostSection = styled.div`
 
     p{
         margin-top: 5px;
+    }
+    @media(max-width: 600px){
+        border-radius: 0px;
     }
 `;
 
@@ -548,6 +596,7 @@ const ConfirmBackground = styled.div`
     left: 0;
     top: 0;
     background: rgba(255, 255, 255, 0.8);
+    
 `;
 
 const Confirm = styled.div`
@@ -556,7 +605,7 @@ const Confirm = styled.div`
     height: 210px;
     z-index: 7;
     padding: 0px 120px 0px 120px ;
-    left: 25%;
+    left: 15%;
     top: 25%;
     background: #333333;
     border-radius: 20px;
@@ -572,6 +621,13 @@ const Confirm = styled.div`
     text-align: center;
     color: #FFFFFF;
 
+    @media(max-width: 600px){
+        width: 70%;
+        padding: 0px 50px 0px 50px ;
+        font-size: 25px;
+        line-height: 28px;
+    }
+
 `;
 
 const HorizontalSelector = styled.div`
@@ -585,11 +641,19 @@ const HorizontalSelector = styled.div`
     font-size: 18px;
     line-height: 22px;
 
-    
     button{
         background: none;
         border: none;
         cursor: pointer;
+    }
+
+    @media(max-width: 600px){
+        flex-direction: column;
+        align-items: center;
+        
+        button{
+            margin-bottom: 10px;
+        }
     }
 `;
 
