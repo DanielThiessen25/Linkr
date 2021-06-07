@@ -4,6 +4,7 @@ import UserContext from '../contexts/UserContext'
 import styled from 'styled-components'
 import { IoChevronDown } from "react-icons/io5"
 import { IconContext } from "react-icons"
+import { Link } from 'react-router-dom'
 
 export default function Header(){
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
@@ -59,7 +60,7 @@ const Navbar = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    z-index: 1;
+    z-index: 5;
 `
 
 const Logo = styled.div`
