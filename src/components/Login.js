@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 import UserContext from './contexts/UserContext'
@@ -11,10 +11,12 @@ export default function Login(){
     const history = useHistory()
     const { setUserInformation } = useContext(UserContext)
     const [ isLoading, setLoading ] = useState(false)
-    
+    const inputRef = useRef();
+
     useEffect(() => {
         checkIfLogged()
-    })
+        inputRef.current.focus()
+    },[])
     
     function checkIfLogged(){
         const userInformation = localStorage.getItem("userInformation")
@@ -49,7 +51,7 @@ export default function Login(){
             </Logo>
             <LoginArea isLoading={isLoading}>
                 <form onSubmit={signIn}>
-                    <input required disabled={isLoading} type="email" placeholder="e-mail" value={email} onChange={e => setEmail(e.target.value)}  />
+                    <input ref={inputRef} required disabled={isLoading} type="email" placeholder="e-mail" value={email} onChange={e => setEmail(e.target.value)}  />
                     <input required disabled={isLoading} type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)}  />
                     <button disabled={isLoading} type="submit" >
                         {(isLoading) ? <Loader type="ThreeDots" color="#FFF"  /> : 'Log In' }

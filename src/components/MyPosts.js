@@ -52,7 +52,7 @@ export default function MyPosts() {
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
-                        <Post object={item} key={item.id} token={token} id={id} listPosts={listPosts} setListPosts={setListPosts}  />
+                        <Post object={item} key={item.id} token={token} id={id} listPosts={listPosts} setListPosts={setListPosts} userId={id} />
                     )
             );
         }

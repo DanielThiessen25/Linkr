@@ -16,8 +16,7 @@ export default function Header(){
     const [ userSearchName, setUserSearchName ] = useState('');
     const [ possibleUsers, setPossibleUsers ] = useState([]);
     const [ alreadyFollowing, setAlreadyFollowing ] = useState([]);
-
-
+    
 
     function logout(){
         setUserInformation(null)
@@ -93,7 +92,7 @@ export default function Header(){
                 </ul>
             </DropdownMenu>
             <UserSearcher>
-                <DebounceInput
+                <DebounceInput 
                         type="text"
                         placeholder="Search for people and friends"
                         className="input"

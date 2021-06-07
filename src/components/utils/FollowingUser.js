@@ -25,6 +25,7 @@ const User = styled.div`
     display: flex;
     align-items: center;
     margin-bottom: 10px;
+    cursor: pointer;
     img{
         height: 39px;
         width: 39px;
