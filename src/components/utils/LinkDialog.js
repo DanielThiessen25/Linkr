@@ -17,7 +17,7 @@ export default function LinkDialog(props){
     );
 }
 
-const EntirePage = styled.div`
+export const EntirePage = styled.div`
     position: fixed;
     left: 0 !important;
     top: 0 !important;
@@ -32,7 +32,7 @@ const EntirePage = styled.div`
     overflow-y: scroll;
 `;
 
-const DialogBox = styled.div`
+export const DialogBox = styled.div`
     width: 966px;
     max-height: 904px;
     background: #333333;
@@ -49,7 +49,7 @@ const DialogBox = styled.div`
     }
 `;
 
-const LineControls = styled.div`
+export const LineControls = styled.div`
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
@@ -63,5 +63,10 @@ const LineControls = styled.div`
         align-items: center;
         border-radius: 5px;
         font-size: 14px;
+    }
+    h2{
+        font-size: 38px;
+        font-family: 'Oswald';
+        font-weight: bold;
     }
 `;

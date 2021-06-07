@@ -227,7 +227,9 @@ export default function Post(props) {
     }
     if(linkGeoDialog){
         return(
-            <GeoDialog  setDialogState={setLinkGeoDialog}/>
+            <GeoDialog  
+            name={props.object.user.username}
+            setDialogState={setLinkGeoDialog}/>
         );
     }
 
@@ -247,7 +249,9 @@ return (
                 <UserLineInfo>
                 <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
                     <GeoIconContainer>
-                        <IoLocationSharp color={'#FFFFFF'} size={'20px'}/>
+                        <IoLocationSharp 
+                        onClick={()=>setLinkGeoDialog(true)}
+                        color={'#FFFFFF'} size={'20px'}/>
                     </GeoIconContainer>   
                 </UserLineInfo> 
                 <Message>{string}

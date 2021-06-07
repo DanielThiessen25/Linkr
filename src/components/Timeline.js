@@ -9,8 +9,6 @@ import Hashtags from "./Hashtags/Hashtags";
 import useInterval from 'react-useinterval';
 import { IoLocationOutline } from 'react-icons/io5';
 import Loader from 'react-loader-spinner'
-
-import useInterval from 'react-useinterval'
 import { useHistory } from 'react-router'
 
 export default function Timeline(){
