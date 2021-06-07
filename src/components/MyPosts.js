@@ -7,14 +7,33 @@ import UserContext from './contexts/UserContext'
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
+import { useHistory } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroller';
 import Loader from 'react-loader-spinner'
-import { useHistory } from 'react-router';
 
 export default function MyPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
-    const [isError, setIsError] = useState(false);
     const history = useHistory();
+    const [lastPost, setLastPost] = useState(0);
+    const [isMore, setIsMore] = useState(true);
+    const information = JSON.parse(localStorage.getItem("userInformation"));
+    const [isError, setIsError] = useState(false);
+    let token, id;
+
+
+    checkIfLogged();
+    function checkIfLogged(){
+        if(!!information){
+            token = information.token
+            id = information.user.id
+            
+        } else {
+            history.push("/")
+            
+        }
+    }
+    
 
     function loadPosts(){
         if(!userInformation){
@@ -22,17 +41,46 @@ export default function MyPosts() {
         }
         const config = {
             headers: {
-                Authorization: `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${token}`
             }
         }
         const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
         request.then(resposta => {
             setListPosts([...resposta.data.posts]);
+            setLastPost(lastPost + 5)
         });
         request.catch(()=>setIsError(true));
     }
 
+    function loadMorePosts(){
+        if(!!listPosts && isMore){
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts" + "?offset=" + lastPost
+            const requisicao = axios.get(url, config);
+            requisicao.then(resposta => {
+                if(resposta.data.posts.length > 0){
+                    setListPosts([...resposta.data.posts]);
+                    setLastPost(lastPost + 5)
+                }
+                else{
+                    setIsMore(false)
+                }
+            });
+            requisicao.catch(err =>{
+                alert(err);
+            })
+        }
+        
+    }
+
     useEffect(() => {
+        if(!!information){
+            setUserInformation(information)
+        }
         loadPosts();
     }, []);
 
@@ -40,7 +88,7 @@ export default function MyPosts() {
         if (listPosts != null) {
             return (
                     listPosts.map(item =>
-                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
+                        <Post object={item} key={item.id} token={token} id={id} listPosts={listPosts} setListPosts={setListPosts} userId={id} />
                     )
             );
         }
@@ -65,10 +113,15 @@ export default function MyPosts() {
             <Header />
             <Title>my posts</Title>
             <Content>
-            <Posts>
-            {showPosts()}
-            </Posts>
-            
+                <Posts>
+                    <InfiniteScroll
+                        pageStart={0}
+                        hasMore={isMore}
+                        loadMore={loadMorePosts}
+                        threshold={0}>
+                            {showPosts()}                    
+                    </InfiniteScroll>
+                </Posts>
 
             { userInformation ? 
             <Hashtags token={userInformation.token}/>

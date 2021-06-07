@@ -1,17 +1,25 @@
-import { useContext } from 'react'
-import { useHistory } from 'react-router-dom'
-import UserContext from '../contexts/UserContext'
-import styled from 'styled-components'
-import { IoChevronDown } from "react-icons/io5"
-import { IconContext } from "react-icons"
-import { Link } from 'react-router-dom'
+import { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import UserContext from '../contexts/UserContext';
+import styled from 'styled-components';
+import { IoChevronDown, IoSearch } from "react-icons/io5";
+import { IconContext } from "react-icons";
+import {DebounceInput} from 'react-debounce-input';
+import axios from 'axios';
+import FollowingUser from './FollowingUser';
+import PossibleUser from './PossibleUser';
+
+
 
 export default function Header(){
-    const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext)
-    const avatar = (!!userInformation) ? userInformation.user.avatar : ''
-    const history = useHistory()
-
+    const { userInformation, setUserInformation, showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext);
+    const avatar = (!!userInformation) ? userInformation.user.avatar : '';
+    const history = useHistory();
+    const [ userSearchName, setUserSearchName ] = useState('');
+    const [ possibleUsers, setPossibleUsers ] = useState([]);
+    const [ alreadyFollowing, setAlreadyFollowing ] = useState([]);
     
+
     function logout(){
         setUserInformation(null)
         localStorage.removeItem("userInformation")
@@ -28,12 +36,50 @@ export default function Header(){
         history.push('/my-likes')
     }
 
+    function searchForUsers(event){
+        const searchedName = event.target.value;
+        setUserSearchName(searchedName);
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInformation.token}`
+            }
+        }
+        if(searchedName.length > 2){
+            const request = axios.get(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/search?username=${searchedName}`, config);
+            request.then((reply) => {
+                console.log(reply.data)
+                console.log(followingUsers)
+                console.log(reply.data.users.filter(user => user.isFollowingLoggedUser === true))
+                setAlreadyFollowing([...reply.data.users.filter(user => user.isFollowingLoggedUser === true)])
+                setPossibleUsers([...reply.data.users.filter(user => user.isFollowingLoggedUser === false)])
+            });
+        }
+    }
+
+    function showFollowingUsers(){
+        return(
+                alreadyFollowing.map(user => 
+                    <FollowingUser user={user} />    
+                )
+        )
+    }
+
+
+    function showPossibleUsers(){
+        return(
+            possibleUsers.map(user => 
+                <PossibleUser user={user} token={userInformation.token} />    
+            )
+        )
+    }
+
+    
     return(
         <Navbar onClick={() => {if(showMenu) setShowMenu(false)}}>
-            <Logo onClick={()=>history.push("/")}>linkr</Logo>
+            <Logo onClick={() => history.push('/timeline')}>linkr</Logo>
             <DropdownMenu showMenu={showMenu} >
                 <DropdownButton showMenu={showMenu} onClick={() => setShowMenu(true)} >
-                    <IconContext.Provider value={{className: "react-icon"}}>
+                    <IconContext.Provider value={{className: "set-icon"}}>
                         <IoChevronDown />
                     </IconContext.Provider>
                 </DropdownButton>
@@ -44,6 +90,28 @@ export default function Header(){
                     <li onClick={logout}>Logout</li>
                 </ul>
             </DropdownMenu>
+            <UserSearcher>
+                <DebounceInput 
+                        type="text"
+                        placeholder="Search for people and friends"
+                        className="input"
+                        minLength={3}
+                        debounceTimeout={300}
+                        value={userSearchName}
+                        onChange={searchForUsers} />
+                {(userSearchName.length > 2) ?
+                <SearchResults>
+                    {showFollowingUsers()}
+                    {showPossibleUsers()}
+                </SearchResults>
+                :
+                ''
+                }
+                
+                <IconContext.Provider value={{className: "search-icon"}}>
+                    <IoSearch />
+                </IconContext.Provider>
+            </UserSearcher>
         </Navbar>
         
     )
@@ -60,7 +128,7 @@ const Navbar = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 0 20px;
-    z-index: 5;
+    z-index: 100;
 `
 
 const Logo = styled.div`
@@ -69,6 +137,7 @@ const Logo = styled.div`
     letter-spacing: 0.05em;
     font-family: 'Passion One', cursive;
     color: #FFFFFF;
+    cursor: pointer;
     @media(max-width: 600px){
         font-size: 45px;
         line-height: 50px;
@@ -139,7 +208,7 @@ const DropdownButton = styled.div`
     align-items: center;
     height: 100%;
     cursor: pointer;
-    .react-icon{
+    .set-icon{
         color: #FFFFFF;
         font-size: 30px;
         margin-right: 18px;
@@ -147,10 +216,76 @@ const DropdownButton = styled.div`
         transform: ${props => props.showMenu ? 'rotate(180deg)' : 'rotate(0deg)'};
     }
     @media(max-width: 600px){
-        .react-icon{
+        .set-icon{
             font-size: 20px;
         }
     }
     
 `
-
+const UserSearcher = styled.div`
+    position: absolute;
+    width: 40%;
+    top: 10px;
+    left: calc(30%);
+    border-radius: 8px;
+    background-color: #e7e7e7;
+    .input{
+        width: 100%;
+        height: 45px;
+        background-color: #FFFFFF;
+        border-radius: inherit;
+        border: none;
+        font-family: 'Lato', sans-serif;
+        font-size: 19px;
+        font-weight: 400;
+        padding: 0 15px;  
+    }
+    .input::placeholder{
+        color: #C6C6C6;
+    }
+    .search-icon{
+        width: 21px;
+        height: 21px;
+        position: absolute;
+        top: calc(45px/2 - 21px/2);
+        right: 15px;
+        color: #c6c6c6;
+    }
+`
+const SearchResults = styled.div`
+    width: 100%;
+    background-color: #e7e7e7;   
+    border-radius: inherit;
+    padding: 10px 10px 0 10px;
+`
+const User = styled.div`
+    font-family: 'Lato', sans-serif;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    img{
+        height: 39px;
+        width: 39px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+`
+const UserName = styled.div`
+    color:#515151;
+    margin-right: 8px;
+`
+const IsFollowing = styled.div`
+    color:#c5c5c5;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+`
+const Dot = styled.div`
+    width: 6px;
+    height: 6px;
+    border-radius:  50%;
+    background-color: #c5c5c5;
+    margin-right: 8px;
+    margin-top: 3px;
+`

@@ -15,9 +15,10 @@ import HashtagPage from './components/Hashtags/HashtagPage';
 export default function App() {
   const [ userInformation, setUserInformation ] = useState(null)
   const [ showMenu, setShowMenu ] = useState(false)
+  const [followingUsers, setFollowingUsers] = useState([]);
 
   return (
-    <UserContext.Provider value={{userInformation, setUserInformation, showMenu, setShowMenu}}>
+    <UserContext.Provider value={{userInformation, setUserInformation, showMenu, setShowMenu, followingUsers, setFollowingUsers}}>
       <BrowserRouter>
         <GlobalStyle />
         <Switch>

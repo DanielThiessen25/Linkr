@@ -1,27 +1,43 @@
-import { useContext, useState } from 'react'
-import UserContext from './contexts/UserContext'
-import styled from 'styled-components'
-import Header from './utils/Header'
-import axios from 'axios'
+import { useContext, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import UserContext from './contexts/UserContext';
+import styled from 'styled-components';
+import Header from './utils/Header';
+import axios from 'axios';
 import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
+import InfiniteScroll from 'react-infinite-scroller';
 import Loader from 'react-loader-spinner'
 
 import useInterval from 'react-useinterval'
-import { useHistory } from 'react-router'
+
 
 export default function Timeline(){
-    const { userInformation, showMenu, setShowMenu } = useContext(UserContext)
+    const { userInformation, setUserInformation , showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext)
     const avatar = (!!userInformation) ? userInformation.user.avatar : ''
     const [ newPostLink, setNewPostLink ] = useState('')
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState(null);
+    const [lastPost, setLastPost] = useState(0);
+    const [isMore, setIsMore] = useState(true);
+    const history = useHistory()
+    const information = JSON.parse(localStorage.getItem("userInformation"));
+    let token, id;
     const [isError, setIsError] = useState(false);
-    const history = useHistory();
 
-    const [followingUsers, setFollowingUsers] = useState([]);
+    checkIfLogged();
+    function checkIfLogged(){
+        if(!!information){
+            token = information.token
+            id = information.user.id
+            
+        } else {
+            history.push("/")
+            
+        }
+    }
 
     function getFollowingUsers(){
         if(!userInformation){
@@ -30,7 +46,7 @@ export default function Timeline(){
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/follows";
         const config = {
             headers: {
-                Authorization: `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${token}`
             }
         }
         const requestFollowing = axios.get(url, config);
@@ -45,33 +61,66 @@ export default function Timeline(){
         }
         const config = {
             headers: {
-                Authorization: `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${token}`
             }
         }
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts"
         const requisicao = axios.get(url, config);
         requisicao.then(resposta => {
-            setListPosts([...resposta.data.posts]);
+            if(resposta.data.posts.length > 0){
+                setListPosts([...resposta.data.posts]);
+                setLastPost(resposta.data.posts[resposta.data.posts.length - 1].id)
+            }
+            else{
+                setIsMore(false)
+            }
         });
         requisicao.catch(err =>{
             alert(err);
         })
     }
 
+    function loadMorePosts(){
+        if(!!listPosts && isMore){
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts" + "?olderThan=" + lastPost
+            const requisicao = axios.get(url, config);
+            requisicao.then(resposta => {
+                if(resposta.data.posts.length > 0){
+                    setListPosts([...resposta.data.posts]);
+                    setLastPost(resposta.data.posts[resposta.data.posts.length - 1].id)
+                }
+                else{
+                    setIsMore(false)
+                }
+            });
+            requisicao.catch(err =>{
+                alert(err);
+            })
+        }
+        
+    }
     useInterval(loadPosts, 15000, 15000)
 
     useEffect(() => {
+        if(!!information){
+            setUserInformation(information)
+        }
         loadPosts();
     }, []);
 
     function showPosts() {
         if (listPosts !== null && listPosts.length && listPosts.length === 0){
-            return(<h2>Nenhuma publicação encontrada.</h2>);
+            return(<h2>Você não segue ninguém ainda, procure alguém na busca</h2>);
         }
         if (listPosts !== null) {
             return (
-                    listPosts.map(item =>
-                        <Post object={item} token={userInformation.token} id={userInformation.user.id}/>
+                    listPosts.map((item,i) =>
+                        <Post object={item} token={token} id={id} key={i} />
                     )
             );
         }
@@ -100,7 +149,7 @@ export default function Timeline(){
         const body = { text: newPostComment , link: newPostLink }
         const config = {
             headers: {
-                "Authorization": `Bearer ${userInformation.token}`
+                Authorization: `Bearer ${userInformation.token}`
             } 
         }
         const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts", body, config)
@@ -122,10 +171,10 @@ export default function Timeline(){
 
 
     return(
-        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
-            <Header/>
+        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}  >
+            <Header />
             <Title>timeline</Title>
-            <Content>
+            <Content >
                 <Posts>
                     <CreatePost>
                         <UserPicture>
@@ -138,10 +187,19 @@ export default function Timeline(){
                             <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
                         </NewPostInformations>
                     </CreatePost>
-                    {getFollowingUsers()}
-                    {followingUsers.length === 0 ?
-                    <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
-                    : showPosts()}
+                    <InfiniteScroll
+                            pageStart={0}
+                            hasMore={isMore}
+                            loadMore={loadMorePosts}
+                            threshold={0}>
+                            
+                                {getFollowingUsers()}
+                                {followingUsers.length === 0 ?
+                                <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
+                                : showPosts()}
+
+                    </InfiniteScroll>
+                    
 
                 </Posts>
                 {userInformation ? 
@@ -166,6 +224,7 @@ export const Content = styled.div`
     display: flex;
     justify-content: space-between;
     width: 100%;
+    
 `
 
 export const Title = styled.div`
@@ -181,6 +240,7 @@ export const Title = styled.div`
 `
 export const Posts = styled.div`
     width: 65%;
+    color: #FFFFFF;
 
     h2{
         color: #ffffff;

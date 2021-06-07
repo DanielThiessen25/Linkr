@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, useRef } from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from 'axios'
 import UserContext from './contexts/UserContext'
@@ -11,10 +11,12 @@ export default function Login(){
     const history = useHistory()
     const { setUserInformation } = useContext(UserContext)
     const [ isLoading, setLoading ] = useState(false)
-    
+    const inputRef = useRef();
+
     useEffect(() => {
         checkIfLogged()
-    })
+        inputRef.current.focus()
+    },[])
     
     function checkIfLogged(){
         const userInformation = localStorage.getItem("userInformation")
@@ -24,11 +26,8 @@ export default function Login(){
         }
     }
 
-    function signIn(){
-        if(email==="" || password===""){
-            alert("Preencha todos os campos")
-            return
-        } 
+    function signIn(event){
+        event.preventDefault()
         setLoading(true)
         const body = { email, password }
         const request = axios.post("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/sign-in", body)
@@ -36,6 +35,7 @@ export default function Login(){
             setUserInformation(reply.data)
             localStorage.setItem("userInformation", JSON.stringify(reply.data))
             history.push('/timeline')
+            console.log(reply.data)
         })
         request.catch(() => {
             alert("email ou senha incorreto(s)")
@@ -50,11 +50,13 @@ export default function Login(){
                 <Subtitle>save, share and discover the best links on the web</Subtitle>
             </Logo>
             <LoginArea isLoading={isLoading}>
-                <input disabled={isLoading} type="text" placeholder="e-mail" value={email} onChange={e => setEmail(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') signIn()}} />
-                <input disabled={isLoading} type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)} onKeyPress={e => {if(e.key === 'Enter') signIn()}} />
-                <button disabled={isLoading} onClick={signIn}>
-                    {(isLoading) ? <Loader type="ThreeDots" color="#FFF"  /> : 'Log In' }
-                </button>
+                <form onSubmit={signIn}>
+                    <input ref={inputRef} required disabled={isLoading} type="email" placeholder="e-mail" value={email} onChange={e => setEmail(e.target.value)}  />
+                    <input required disabled={isLoading} type="password" placeholder="password" value={password} onChange={e => setPassword(e.target.value)}  />
+                    <button disabled={isLoading} type="submit" >
+                        {(isLoading) ? <Loader type="ThreeDots" color="#FFF"  /> : 'Log In' }
+                    </button>
+                </form>
                 <SignUpLink disabled={isLoading} onClick={() => history.push('/sign-up')}>First time? Create an account!</SignUpLink>
             </LoginArea>
         </LoginPage>      

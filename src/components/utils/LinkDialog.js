@@ -24,7 +24,7 @@ const EntirePage = styled.div`
     bottom: 0;
     right: 0;
     background: rgba(255, 255, 255, 0.9);
-    z-index: 7;
+    z-index: 200;
     display: flex;
     justify-content: center;
     padding-top: 63px;

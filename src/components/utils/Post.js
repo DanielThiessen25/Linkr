@@ -1,10 +1,15 @@
 import styled from 'styled-components';
-import React, { useContext, useState, useEffect } from 'react';
-import UserContext from '../contexts/UserContext';
-import { FaRegHeart, FaHeart } from "react-icons/fa";
-import { FiSend } from "react-icons/fi";
+import React, { useState, useEffect, useRef } from 'react';
+import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
 import ReactTooltip from 'react-tooltip';
+import Modal from 'react-modal';
+import { IoTrash } from "react-icons/io5";
+import { IoMdCreate } from "react-icons/io";
+import { IconContext } from "react-icons";
+import { useContext } from 'react';
+import UserContext from '../contexts/UserContext';
+import { FiSend } from "react-icons/fi";
 import { Link } from 'react-router-dom';
 import { AiOutlineComment } from "react-icons/ai";
 import { CgRepeat } from "react-icons/cg";
@@ -19,6 +24,11 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
+    const [ modalIsOpen, setIsOpen ] = useState(false);
+    const [ postComments, setPostComments ] = useState('')
+    const [ toEditPost, setToEditPost ] = useState(false)
+    const [ isLoading, setLoading ] = useState(false)
+    const inputRef = useRef();
     const [comments, setComments] = useState();
     const [clickComment, setClickComment]= useState(false);
     const [clickRepost, setClickRepost]= useState(false);
@@ -223,10 +233,81 @@ export default function Post(props) {
         );
     }
 
+    function deletePost(){
+        const config = {
+            headers: {
+                Authorization: `Bearer ${props.token}`
+            }
+        }
+        const request = axios.delete(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/${props.object.id}`, config)
+        request.then(reply => {
+            const listPosts = props.listPosts
+            const filteredPosts = listPosts.filter(post => post.id !== props.object.id)
+            props.setListPosts([...filteredPosts])
+        })
+        request.catch(() => alert("Post was not possible to be deleted"))
+    }
+
+    function editPost(){
+        inputRef.current.focus()
+        setToEditPost(true)
+        let hashtagsText = ""
+        for(let i = 0; i < hashtags.length - 1; i++){
+            if(i === hashtags.length - 2){
+                hashtagsText += "#" + hashtags[i]    
+            }
+            else{
+                hashtagsText += "#" + hashtags[i] + " "
+            }
+        }
+        console.log("string " + string[0])
+        if(string[0] === ''){
+            setPostComments(hashtagsText) 
+        }
+        else{
+            setPostComments(string[0] + hashtagsText)
+        }
+    }
+
+    function removeEdit(){
+        setToEditPost(false)
+        setPostComments('')
+    }
+
+    function sendChanges(){
+        setLoading(true)
+        const body = {text: postComments}
+        
+        const config = {
+            headers: {
+                Authorization: `Bearer ${props.token}`
+            }
+        }
+        const request = axios.put(`https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/posts/${props.object.id}`, body, config)
+        request.then(reply => {
+            const listPosts = props.listPosts
+            for(let i = 0; i < listPosts.length; i++ ){
+                if(listPosts[i].id === props.object.id){
+                    listPosts[i] = reply.data.post
+                }
+            }
+            setToEditPost(false)
+            setPostComments('')
+            setLoading(false)
+            props.setListPosts([...listPosts])
+            
+        })
+        request.catch(() => {
+            alert("falha ao fazer alterações no post")
+            setLoading(false)
+        })
+    }
+
+    
 return (
     <PostContainer>
         {showReposts()}
-        <Box isYoutubeLink={youtubeLinkPost}>
+        <Box isYoutubeLink={youtubeLinkPost} postUserId={props.object.user.id} userId={props.userId} toEditPost={toEditPost} >
             <VerticalSelector>
                 <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
                 {printLikes()}
@@ -235,13 +316,13 @@ return (
                 <Option><button onClick={()=> setClickComment(!clickComment)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Option>
                 <Option><button onClick={()=> setClickRepost(true)}><CgRepeat size="2.5em" color="#FFFFFF" /></button><p>{props.object.repostCount + " re-posts"}</p></Option>
             </VerticalSelector>
-            <Text>
+            <Text toEditPost={toEditPost} >
                 <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
-                <Message>{string}
-                    {hashtags.map(item =>
-                        <h5>{"#" + item + " "}</h5>
-                    )}
+                <Message toEditPost={toEditPost} onClick={() => {if(props.userId === props.object.user.id) editPost()}}>    {string}
+                                                {hashtags.map((item,i) => <h5 key={i}>{"#"+ item + " "}</h5>)}
                 </Message>
+                <input disabled={isLoading} ref={inputRef} type="text" value={postComments} onChange={e => setPostComments(e.target.value)} onKeyDown={e => {if(e.key === 'Escape') removeEdit()
+                                                                                                                                           if(e.key === 'Enter') sendChanges()}} />
             { youtubeLinkPost ? 
                     <><Youtube videoId={getYoutubeID(props.object.link)}/>
                     <p onClick={()=>setLinkToDialog(true)}>{props.object.link}</p></>
@@ -255,7 +336,27 @@ return (
                     
                 </Bookmark>}
             </Text>
-            
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => setIsOpen(false)}
+                style={modalStyles}
+                >
+                    <ModalTitle>Tem certeza que deseja excluir essa publicação?</ModalTitle>
+                    <Buttons>
+                        <CloseButton onClick={e => {e.stopPropagation()
+                                                    setIsOpen(false)
+                                                    }}>Não, voltar</CloseButton>
+                        <ConfirmButton onClick={deletePost}>Sim, excluir</ConfirmButton>
+                    </Buttons>
+            </Modal>
+            <IconContext.Provider value={{className: "trash-icon"}}>
+                <IoTrash onClick={() => setIsOpen(true)} />
+            </IconContext.Provider>
+            <IconContext.Provider value={{className: "edit-icon"}} >
+                <IoMdCreate onClick={() => {if(toEditPost) removeEdit()
+                                            else editPost()}} />
+            </IconContext.Provider>
+
         </Box>
         {showComments()}
     </PostContainer>
@@ -269,6 +370,7 @@ const PostContainer = styled.div`
 `;
 
 const Box = styled.div`
+position: relative;
 width: 100%;
 min-height: ${props => props.isYoutubeLink ? '433px': '276px'};
 margin-bottom: 16px;
@@ -277,7 +379,27 @@ border-radius: 16px;
 display: flex;
 flex-direction: row;
 padding: 20px;
-z-index: 2;
+z-index: 5;
+.trash-icon{
+    display: ${props => (props.userId === props.postUserId) ? 'initial' : 'none'};
+    cursor: pointer;
+    color: #ffffff;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+}
+.edit-icon{
+    display: ${props => (props.userId === props.postUserId ) ? 'initial' : 'none'};
+    cursor: pointer;
+    color: #ffffff;
+    width: 14px;
+    height: 14px;
+    position: absolute;
+    top: 15px;
+    right: 50px;
+}
 
 @media(max-width: 600px){
     min-height: ${props => props.isYoutubeLink ? '433px': '230px'};
@@ -286,10 +408,31 @@ z-index: 2;
 `;
 
 const Text = styled.div`
+    position: relative;
     width: 100%;
     margin-left: 18px;
     display: flex;
     flex-direction:column;
+    input {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        min-width: 100%;
+        max-width: 100%;
+        background: #FFFFFF;
+        border-radius: 7px;
+        border: none;
+        margin-top: 9px;
+        padding: 3px;
+        font-weight: normal;
+        font-size: 16px;
+        color: #4C4C4C;
+        font-family: Lato;
+        z-index: ${props => props.toEditPost ? '2' : '-1'};
+        ${props => props.toEditPost ?
+        '': 'display: none;'
+        }
+    }
     iframe{
         height: 281px;
         width: 100%;
@@ -380,9 +523,15 @@ margin-bottom: 10px;
 display: flex;
 flex-wrap: wrap;
 flex-direction: row;
+cursor: pointer;
+transition: all .3s;
+z-index: ${props => props.toEditPost ? '-1' : '2'};
 h5{
     margin-left: 9px;
     color: white;
+}
+&:hover{
+    background-color: #333333;
 }
 @media(max-width: 600px){
     font-size: 15px;
@@ -465,6 +614,19 @@ const Picture = styled.div`
     
 `;
 
+const ModalTitle = styled.div`
+    font-size: 34px;
+    line-height: 41px;
+    color: #FFFFFF;
+    text-align: center;
+    width: 70%;
+    @media(max-width: 600px){
+        font-size: 18px;
+    }
+
+`
+
+
 const CommentBox = styled.div`
     width: 100%;
     height: auto;
@@ -484,7 +646,7 @@ const RepostSection = styled.div`
     margin-bottom: -33px;
     padding-top: 5px;
     padding-left: 15px;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     flex-direction: row;
     font-family: Lato;
@@ -590,7 +752,7 @@ const CommentContent = styled.div`
 
 const ConfirmBackground = styled.div`
     position: fixed;
-    z-index: 6;
+    z-index: 200;
     width: 100%;
     height: 100%;
     left: 0;
@@ -630,7 +792,75 @@ const Confirm = styled.div`
 
 `;
 
-const HorizontalSelector = styled.div`
+
+    
+const Buttons = styled.div`
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    margin-top: 20px;
+    padding: 0 50px;
+    @media(max-width: 600px){
+        padding: 0 20px;
+    }
+`
+
+const ConfirmButton = styled.div`
+    width: 134px;
+    height: 37px;
+    color: #FFFFFF;
+    border-radius: 5px;
+    background-color: #1877F2;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    @media(max-width: 600px){
+        width: 70px;
+        height: 20px;
+        font-size: 10px;
+    }
+`
+
+const CloseButton = styled.div`
+    width: 134px;
+    height: 37px;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    font-size: 18px;
+    color: #1877F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    @media(max-width: 600px){
+        width: 70px;
+        height: 20px;
+        font-size: 10px;
+    }
+`
+
+const modalStyles = {
+    content : {
+        'width': '54vw',
+        'height': '36vh',   
+        'top': 'calc(50% - 18vh)',
+        'left': 'calc(27vw)',
+        'backgroundColor': '#333333',
+        'borderRadius': '50px',
+        'fontFamily': 'font-family: Lato',
+        'fontWeight': 'bold',
+        'display': 'flex',
+        'flexDirection': 'column',
+        'justifyContent': 'center',
+        'alignItems': 'center',
+    },
+    overlay: {zIndex: 200}
+  };
+  const HorizontalSelector = styled.div`
     display: flex;
     width: 100%;
     flex-direction: row;
