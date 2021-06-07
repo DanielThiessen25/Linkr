@@ -9,6 +9,7 @@ import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
 import { useHistory } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroller';
+import Loader from 'react-loader-spinner'
 
 export default function MyPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
@@ -17,6 +18,7 @@ export default function MyPosts() {
     const [lastPost, setLastPost] = useState(0);
     const [isMore, setIsMore] = useState(true);
     const information = JSON.parse(localStorage.getItem("userInformation"));
+    const [isError, setIsError] = useState(false);
     let token, id;
 
 
@@ -31,18 +33,23 @@ export default function MyPosts() {
             
         }
     }
+    
 
     function loadPosts(){
+        if(!userInformation){
+            return;
+        }
         const config = {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         }
-        const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + id + "/posts", config);
-        requisicao.then(resposta => {
+        const request = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + userInformation.user.id + "/posts", config);
+        request.then(resposta => {
             setListPosts([...resposta.data.posts]);
             setLastPost(lastPost + 5)
         });
+        request.catch(()=>setIsError(true));
     }
 
     function loadMorePosts(){
@@ -85,10 +92,24 @@ export default function MyPosts() {
                     )
             );
         }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
+        }
+        else if(isError === true){
+            return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else{
+            return(
+                <Loading>Loading <Loader type="ThreeDots" color="#FFF" size="5em" /></Loading>   
+              
+            );
+        }
     }
-
+    if(!userInformation){
+        history.push("/");
+    }
     return (
-        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
+        <MyPostsPage onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Header />
             <Title>my posts</Title>
             <Content>
@@ -103,26 +124,34 @@ export default function MyPosts() {
                         </Posts>
             </InfiniteScroll>
 
-            <Hashtags token={token}/>
+            { userInformation ? 
+            <Hashtags token={userInformation.token}/>
+            : '' }
             </Content>
 
-        </TimelinePage>
+        </MyPostsPage>
 
     );
 
 }
 
-const TimelinePage = styled.div`
+const MyPostsPage = styled.div`
     padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
+    @media(max-width: 600px){
+        width: 100%;
+        padding: 125px 0px 0 0px;
+    }
 `
 
 const Posts = styled.div`
     width: 65%;
     display: flex;
     flex-direction: column;
-    
+    @media(max-width: 600px){
+        width: 100%;
+    }
 `
 
 const Title = styled.div`
@@ -132,6 +161,9 @@ const Title = styled.div`
     font-weight: bold;
     font-size: 43px;
     margin-bottom: 45px;
+    @media(max-width: 600px){
+        padding-left:20px;
+    }
 `
 
 const Content = styled.div`
@@ -140,3 +172,18 @@ const Content = styled.div`
     width: 100%;
 `
 
+const Loading = styled.div`
+margin-left: 25%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 43px;
+`;
+
+const Warning = styled.div`
+    margin-left: 15%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 35px;
+`;

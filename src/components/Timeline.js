@@ -8,6 +8,10 @@ import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
 import InfiniteScroll from 'react-infinite-scroller';
+import Loader from 'react-loader-spinner'
+
+import useInterval from 'react-useinterval'
+import { useHistory } from 'react-router'
 
 export default function Timeline(){
     const { userInformation, setUserInformation , showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext)
@@ -21,6 +25,8 @@ export default function Timeline(){
     const history = useHistory()
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
+    const [isError, setIsError] = useState(false);
+    const history = useHistory();
 
     checkIfLogged();
     function checkIfLogged(){
@@ -35,6 +41,9 @@ export default function Timeline(){
     }
 
     function getFollowingUsers(){
+        if(!userInformation){
+            return;
+        }
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/follows";
         const config = {
             headers: {
@@ -48,6 +57,9 @@ export default function Timeline(){
     }
 
     function loadPosts(){
+        if(!userInformation){
+            return;
+        }
         const config = {
             headers: {
                 Authorization: `Bearer ${token}`
@@ -93,6 +105,7 @@ export default function Timeline(){
         }
         
     }
+    useInterval(loadPosts, 15000, 15000)
 
     useEffect(() => {
         if(!!information){
@@ -112,6 +125,20 @@ export default function Timeline(){
                     )
             );
         }
+        else if(isError === true){
+            return(<Warning>There was an error, please refresh the page...</Warning>);
+        }
+        else if(listPosts == []){
+            return(<Warning>No posts found</Warning>);
+        }
+        else{
+            return(
+                
+                <Loading>Loading <Loader type="ThreeDots" color="#FFF" size="5em" /></Loading>   
+              
+            );
+        }
+        
     }
 
     function publish(){
@@ -138,6 +165,11 @@ export default function Timeline(){
             setIsPublishing(false)
         })
     }
+
+    if(!userInformation){
+        history.push("/");
+    }
+
 
     return(
         <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}  >
@@ -171,7 +203,9 @@ export default function Timeline(){
                     
 
                 </Posts>
-                <Hashtags token={token}/>
+                {userInformation ? 
+                <Hashtags token={userInformation.token}/>
+                : ''}
             </Content>
               
         </TimelinePage>
@@ -182,6 +216,10 @@ export const TimelinePage = styled.div`
     padding: 125px 20px 0 20px;
     margin: 0 auto;
     width: 70%;
+    @media(max-width: 600px){
+        width: 100%;
+        padding: 125px 0px 0 0px;
+    }
 `
 export const Content = styled.div`
     display: flex;
@@ -197,10 +235,30 @@ export const Title = styled.div`
     font-weight: bold;
     font-size: 43px;
     margin-bottom: 45px;
+    @media(max-width: 600px){
+        padding-left:20px;
+    }
 `
 export const Posts = styled.div`
     width: 65%;
     color: #FFFFFF;
+
+    h2{
+        color: #ffffff;
+    }
+
+    @media(max-width: 600px){
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        h2{
+            width: 80%;
+        }
+    }
+
+
 `
 
 const CreatePost = styled.div`
@@ -211,6 +269,13 @@ const CreatePost = styled.div`
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 16px;
     font-family: 'Lato', sans-serif;
+    @media(max-width: 600px){
+        width: 100%;
+        border-radius: 0px;
+        flex-direction: column;
+        align-items: center;
+    }
+    
 `
 const UserPicture = styled.div`
     padding: 18px 16px;
@@ -219,12 +284,20 @@ const UserPicture = styled.div`
         height: 50px;
         border-radius: 50%;
     }
+    @media(max-width: 600px){
+        display: none;
+    }
+
 `
 const CreatePostTitle = styled.div`
     font-weight: 300;
     font-size: 20px;
     color: #707070;
     margin-bottom: 15px;
+    @media(max-width: 600px){
+        text-align: center;
+    }
+    
 `
 const NewPostInformations = styled.div`
     width: 100%;
@@ -273,4 +346,28 @@ const NewPostInformations = styled.div`
         color: #FFFFFF;
         cursor: pointer;
     }
+
+
+    @media(max-width: 600px){
+        width: 90%;
+        flex-direction: column;
+        align-items: center;
+        padding:20px 0px 16px 0px;
+    }
 `
+
+const Loading = styled.div`
+margin-left: 25%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 43px;
+`;
+
+const Warning = styled.div`
+    margin-left: 15%;
+    color: #FFFFFF;
+    font-family: 'Oswald', sans-serif;
+    font-weight: bold;
+    font-size: 35px;
+`;

@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import Header from "../utils/Header";
 import { TimelinePage, Title, Content, Posts } from '../Timeline';
 import Hashtags from "./Hashtags";
@@ -39,6 +39,9 @@ export default function HashtagPage(){
     },[])
 
     function getHashtagPosts(){
+        if(!userInformation){
+            return;
+        }
         const url = `https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/hashtags/${hashtag}/posts`;
         const config = {
             headers: {
@@ -82,6 +85,9 @@ export default function HashtagPage(){
 
 
 
+    if(!userInformation){
+        history.push("/");
+    }
     return(
         <TimelinePage>
             <Header/>
@@ -107,7 +113,10 @@ export default function HashtagPage(){
                             }
                         </Posts>
                 </InfiniteScroll>
-                <Hashtags token={token}/>
+                {userInformation ?
+                <Hashtags token={userInformation.token}/>
+                : ''}
+
             </Content>
         </TimelinePage>
     );

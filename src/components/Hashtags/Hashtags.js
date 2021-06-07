@@ -61,7 +61,7 @@ export default function Hashtags(props){
 const HashTagStyles = styled.div`
     background: #171717;
     border-radius: 16px;
-    width: 301px;
+    width: 300px;
     height: 100%;
     margin-left: 20px;
     h2{
@@ -69,6 +69,9 @@ const HashTagStyles = styled.div`
         font-weight: bold;
         font-size: 27px;
         color: #FFFFFF;
+    }
+    @media(max-width: 600px){
+        display: none;
     }
 `;
 const Title = styled.div`
