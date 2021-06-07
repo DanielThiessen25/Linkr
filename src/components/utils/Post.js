@@ -166,7 +166,7 @@ export default function Post(props) {
             </VerticalSelector>
             <Text toEditPost={toEditPost} >
                 <Name>{props.object.user.username}</Name>
-                <Message toEditPost={toEditPost} onClick={editPost}>    {string}
+                <Message toEditPost={toEditPost} onClick={() => {if(props.userId === props.object.user.id) editPost()}}>    {string}
                                                 {hashtags.map((item,i) => <h5 key={i}>{"#"+ item + " "}</h5>)}
                 </Message>
                 <input disabled={isLoading} ref={inputRef} type="text" value={postComments} onChange={e => setPostComments(e.target.value)} onKeyDown={e => {if(e.key === 'Escape') removeEdit()

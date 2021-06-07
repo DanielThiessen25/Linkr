@@ -66,15 +66,12 @@ export default function Header(){
     function showPossibleUsers(){
         return(
             possibleUsers.map(user => 
-                <PossibleUser user={user} />    
+                <PossibleUser user={user} token={userInformation.token} />    
             )
         )
     }
 
-    function goToUserPage(user){
-        history.push(`/user/${user.id}`)
-    }
-
+    
     return(
         <Navbar onClick={() => {if(showMenu) setShowMenu(false)}}>
             <Logo onClick={() => history.push('/timeline')}>linkr</Logo>

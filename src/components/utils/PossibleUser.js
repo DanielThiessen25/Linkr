@@ -1,7 +1,8 @@
 import styled from 'styled-components'
 import { useHistory } from 'react-router-dom'
+import axios from 'axios'
 
-export default function PossibleUser({user}){
+export default function PossibleUser({user,token}){
     const history = useHistory();
 
     function goToUserPage(){

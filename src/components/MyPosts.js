@@ -8,11 +8,14 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Hashtags from "./Hashtags/Hashtags";
 import { useHistory } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroller';
 
 export default function MyPosts() {
     const { userInformation, setUserInformation, showMenu, setShowMenu } = useContext(UserContext);
     const [listPosts, setListPosts] = useState();
     const history = useHistory();
+    const [lastPost, setLastPost] = useState(0);
+    const [isMore, setIsMore] = useState(true);
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
 
@@ -38,7 +41,33 @@ export default function MyPosts() {
         const requisicao = axios.get("https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/users/" + id + "/posts", config);
         requisicao.then(resposta => {
             setListPosts([...resposta.data.posts]);
+            setLastPost(lastPost + 5)
         });
+    }
+
+    function loadMorePosts(){
+        if(!!listPosts && isMore){
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts" + "?offset=" + lastPost
+            const requisicao = axios.get(url, config);
+            requisicao.then(resposta => {
+                if(resposta.data.posts.length > 0){
+                    setListPosts([...resposta.data.posts]);
+                    setLastPost(lastPost + 5)
+                }
+                else{
+                    setIsMore(false)
+                }
+            });
+            requisicao.catch(err =>{
+                alert(err);
+            })
+        }
+        
     }
 
     useEffect(() => {
@@ -63,10 +92,16 @@ export default function MyPosts() {
             <Header />
             <Title>my posts</Title>
             <Content>
-            <Posts>
-            {showPosts()}
-            </Posts>
             
+            <InfiniteScroll
+                pageStart={0}
+                hasMore={isMore}
+                loadMore={loadMorePosts}
+                threshold={0}>
+                        <Posts>
+                            {showPosts()}                    
+                        </Posts>
+            </InfiniteScroll>
 
             <Hashtags token={token}/>
             </Content>

@@ -7,6 +7,7 @@ import axios from 'axios';
 import Post from "./utils/Post";
 import { useEffect } from 'react';
 import Hashtags from "./Hashtags/Hashtags";
+import InfiniteScroll from 'react-infinite-scroller';
 
 export default function Timeline(){
     const { userInformation, setUserInformation , showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext)
@@ -15,6 +16,8 @@ export default function Timeline(){
     const [ newPostComment, setNewPostComment ] = useState('')
     const [ isPublishing, setIsPublishing ] = useState(false)
     const [listPosts, setListPosts] = useState(null);
+    const [lastPost, setLastPost] = useState(0);
+    const [isMore, setIsMore] = useState(true);
     const history = useHistory()
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
@@ -53,12 +56,42 @@ export default function Timeline(){
         const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts"
         const requisicao = axios.get(url, config);
         requisicao.then(resposta => {
-            setListPosts([...resposta.data.posts]);
-            
+            if(resposta.data.posts.length > 0){
+                setListPosts([...resposta.data.posts]);
+                setLastPost(resposta.data.posts[resposta.data.posts.length - 1].id)
+            }
+            else{
+                setIsMore(false)
+            }
         });
         requisicao.catch(err =>{
             alert(err);
         })
+    }
+
+    function loadMorePosts(){
+        if(!!listPosts && isMore){
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+            const url = "https://mock-api.bootcamp.respondeai.com.br/api/v2/linkr/following/posts" + "?olderThan=" + lastPost
+            const requisicao = axios.get(url, config);
+            requisicao.then(resposta => {
+                if(resposta.data.posts.length > 0){
+                    setListPosts([...resposta.data.posts]);
+                    setLastPost(resposta.data.posts[resposta.data.posts.length - 1].id)
+                }
+                else{
+                    setIsMore(false)
+                }
+            });
+            requisicao.catch(err =>{
+                alert(err);
+            })
+        }
+        
     }
 
     useEffect(() => {
@@ -74,8 +107,8 @@ export default function Timeline(){
         }
         if (listPosts !== null) {
             return (
-                    listPosts.map(item =>
-                        <Post object={item} token={token} id={id}/>
+                    listPosts.map((item,i) =>
+                        <Post object={item} token={token} id={id} key={i} />
                     )
             );
         }
@@ -107,10 +140,10 @@ export default function Timeline(){
     }
 
     return(
-        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}>
+        <TimelinePage onClick={() => {if(showMenu) setShowMenu(false)}}  >
             <Header />
             <Title>timeline</Title>
-            <Content>
+            <Content >
                 <Posts>
                     <CreatePost>
                         <UserPicture>
@@ -123,10 +156,19 @@ export default function Timeline(){
                             <button disabled={isPublishing} onClick={publish} >{isPublishing ? 'Publicando' : 'Publicar'}</button>
                         </NewPostInformations>
                     </CreatePost>
-                    {getFollowingUsers()}
-                    {followingUsers.length === 0 ?
-                    <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
-                    : showPosts()}
+                    <InfiniteScroll
+                            pageStart={0}
+                            hasMore={isMore}
+                            loadMore={loadMorePosts}
+                            threshold={0}>
+                            
+                                {getFollowingUsers()}
+                                {followingUsers.length === 0 ?
+                                <h2>Você não segue ninguém ainda, procure por perfis na busca</h2>
+                                : showPosts()}
+
+                    </InfiniteScroll>
+                    
 
                 </Posts>
                 <Hashtags token={token}/>
@@ -145,6 +187,7 @@ export const Content = styled.div`
     display: flex;
     justify-content: space-between;
     width: 100%;
+    
 `
 
 export const Title = styled.div`
