@@ -379,6 +379,7 @@ border-radius: 16px;
 display: flex;
 flex-direction: row;
 padding: 20px;
+z-index: 5;
 .trash-icon{
     display: ${props => (props.userId === props.postUserId) ? 'initial' : 'none'};
     cursor: pointer;
@@ -399,7 +400,6 @@ padding: 20px;
     top: 15px;
     right: 50px;
 }
-z-index: 2;
 
 @media(max-width: 600px){
     min-height: ${props => props.isYoutubeLink ? '433px': '230px'};
@@ -428,7 +428,7 @@ const Text = styled.div`
         font-size: 16px;
         color: #4C4C4C;
         font-family: Lato;
-        z-index: ${props => props.toEditPost ? 'initial' : '-1'};
+        z-index: ${props => props.toEditPost ? '2' : '-1'};
     }
     iframe{
         height: 281px;
@@ -522,7 +522,7 @@ flex-wrap: wrap;
 flex-direction: row;
 cursor: pointer;
 transition: all .3s;
-z-index: ${props => props.toEditPost ? '-1' : 'initial'};
+z-index: ${props => props.toEditPost ? '-1' : '2'};
 h5{
     margin-left: 9px;
     color: white;
@@ -643,7 +643,7 @@ const RepostSection = styled.div`
     margin-bottom: -33px;
     padding-top: 5px;
     padding-left: 15px;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     flex-direction: row;
     font-family: Lato;
@@ -749,7 +749,7 @@ const CommentContent = styled.div`
 
 const ConfirmBackground = styled.div`
     position: fixed;
-    z-index: 6;
+    z-index: 200;
     width: 100%;
     height: 100%;
     left: 0;
@@ -842,10 +842,10 @@ const CloseButton = styled.div`
 
 const modalStyles = {
     content : {
-        'width': '42%',
-        'height': '28%',   
-        'top': 'calc(50% - 12.5%)',
-        'left': 'calc(30%)',
+        'width': '54vw',
+        'height': '36vh',   
+        'top': 'calc(50% - 18vh)',
+        'left': 'calc(27vw)',
         'backgroundColor': '#333333',
         'borderRadius': '50px',
         'fontFamily': 'font-family: Lato',
@@ -854,7 +854,8 @@ const modalStyles = {
         'flexDirection': 'column',
         'justifyContent': 'center',
         'alignItems': 'center',
-    }
+    },
+    overlay: {zIndex: 200}
   };
   const HorizontalSelector = styled.div`
     display: flex;

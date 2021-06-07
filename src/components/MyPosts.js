@@ -113,16 +113,15 @@ export default function MyPosts() {
             <Header />
             <Title>my posts</Title>
             <Content>
-            
-            <InfiniteScroll
-                pageStart={0}
-                hasMore={isMore}
-                loadMore={loadMorePosts}
-                threshold={0}>
-                        <Posts>
+                <Posts>
+                    <InfiniteScroll
+                        pageStart={0}
+                        hasMore={isMore}
+                        loadMore={loadMorePosts}
+                        threshold={0}>
                             {showPosts()}                    
-                        </Posts>
-            </InfiniteScroll>
+                    </InfiniteScroll>
+                </Posts>
 
             { userInformation ? 
             <Hashtags token={userInformation.token}/>
