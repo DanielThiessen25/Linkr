@@ -8,13 +8,8 @@ import {DebounceInput} from 'react-debounce-input';
 import axios from 'axios';
 import FollowingUser from './FollowingUser';
 import PossibleUser from './PossibleUser';
-import { useContext } from 'react'
-import { useHistory } from 'react-router-dom'
-import UserContext from '../contexts/UserContext'
-import styled from 'styled-components'
-import { IoChevronDown } from "react-icons/io5"
-import { IconContext } from "react-icons"
-import { Link } from 'react-router-dom'
+
+
 
 export default function Header(){
     const { userInformation, setUserInformation, showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext);

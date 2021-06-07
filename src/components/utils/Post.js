@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-<<<<<<< HEAD
 import React, { useState, useEffect, useRef } from 'react';
 import {FaRegHeart, FaHeart} from "react-icons/fa";
 import axios from 'axios';
@@ -8,20 +7,15 @@ import Modal from 'react-modal';
 import { IoTrash } from "react-icons/io5";
 import { IoMdCreate } from "react-icons/io";
 import { IconContext } from "react-icons";
-=======
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import UserContext from '../contexts/UserContext';
-import { FaRegHeart, FaHeart } from "react-icons/fa";
 import { FiSend } from "react-icons/fi";
-import axios from 'axios';
-import ReactTooltip from 'react-tooltip';
 import { Link } from 'react-router-dom';
 import { AiOutlineComment } from "react-icons/ai";
 import { CgRepeat } from "react-icons/cg";
 import LinkDialog from './LinkDialog';
 import getYoutubeID from 'get-youtube-id';
 import Youtube from 'react-youtube';
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
 
 export default function Post(props) {
     const { userInformation, showMenu, setShowMenu } = useContext(UserContext);
@@ -30,14 +24,11 @@ export default function Post(props) {
     var hashtags = string.splice(1, string.length);
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(props.object.likes.length);
-<<<<<<< HEAD
     const [ modalIsOpen, setIsOpen ] = useState(false);
     const [ postComments, setPostComments ] = useState('')
     const [ toEditPost, setToEditPost ] = useState(false)
     const [ isLoading, setLoading ] = useState(false)
     const inputRef = useRef();
-    
-=======
     const [comments, setComments] = useState();
     const [clickComment, setClickComment]= useState(false);
     const [clickRepost, setClickRepost]= useState(false);
@@ -58,22 +49,18 @@ export default function Post(props) {
         request.then(resposta=>setComments(resposta.data.comments));
     }
 
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
     useEffect(() => {
         for (let i = 0; i < props.object.likes.length; i++) {
             if (props.object.likes[i].userId === props.id) {
                 setLiked(true);
             }
         }
-<<<<<<< HEAD
-=======
         loadComments();
 
         if(props.object.repostedBy != null){
             setIsReposted(true);
         }
 
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
     }, []);
     useEffect(()=>{
         if(getYoutubeID(props.object.link) !== null){
@@ -126,11 +113,6 @@ export default function Post(props) {
                 }
 
             }
-<<<<<<< HEAD
-            else if(likes === 3){
-                console.log(props.object.likes);
-                sentence = "Você,"+ props.object.likes[1].username + " e outras" + (props.object.likes.length - 1) + "pessoas";
-=======
             else if (likes >= 3) {
                 if (props.object.likes[0].userId === props.id) {
                     sentence = "Você, " + props.object.likes[1]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
@@ -139,7 +121,6 @@ export default function Post(props) {
                     sentence = "Você, " + props.object.likes[0]['user.username'] + " e outras " + (props.object.likes.length - 2) + " pessoas";
                 }
 
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
             }
 
         }
@@ -252,7 +233,6 @@ export default function Post(props) {
         );
     }
 
-<<<<<<< HEAD
     function deletePost(){
         const config = {
             headers: {
@@ -323,14 +303,11 @@ export default function Post(props) {
         })
     }
 
-    return (
-        <Box postUserId={props.object.user.id} userId={props.userId} toEditPost={toEditPost} >
-=======
+    
 return (
     <PostContainer>
         {showReposts()}
-        <Box isYoutubeLink={youtubeLinkPost}>
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
+        <Box isYoutubeLink={youtubeLinkPost} postUserId={props.object.user.id} userId={props.userId} toEditPost={toEditPost} >
             <VerticalSelector>
                 <Link to={`/user/${props.object.user.id}`}><Avatar><img src={props.object.user.avatar} /></Avatar></Link>
                 {printLikes()}
@@ -339,30 +316,18 @@ return (
                 <Option><button onClick={()=> setClickComment(!clickComment)}><AiOutlineComment size="1.8em" color="#FFFFFF" /></button><p>{printComments()}</p></Option>
                 <Option><button onClick={()=> setClickRepost(true)}><CgRepeat size="2.5em" color="#FFFFFF" /></button><p>{props.object.repostCount + " re-posts"}</p></Option>
             </VerticalSelector>
-<<<<<<< HEAD
             <Text toEditPost={toEditPost} >
-                <Name>{props.object.user.username}</Name>
+                <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
                 <Message toEditPost={toEditPost} onClick={() => {if(props.userId === props.object.user.id) editPost()}}>    {string}
                                                 {hashtags.map((item,i) => <h5 key={i}>{"#"+ item + " "}</h5>)}
                 </Message>
                 <input disabled={isLoading} ref={inputRef} type="text" value={postComments} onChange={e => setPostComments(e.target.value)} onKeyDown={e => {if(e.key === 'Escape') removeEdit()
                                                                                                                                            if(e.key === 'Enter') sendChanges()}} />
-                <Bookmark>
-                <Picture><img src={props.object.linkImage} /></Picture>
-=======
-            <Text>
-                <Link to={`/user/${props.object.user.id}`}><Name>{props.object.user.username}</Name></Link>
-                <Message>{string}
-                    {hashtags.map(item =>
-                        <h5>{"#" + item + " "}</h5>
-                    )}
-                </Message>
             { youtubeLinkPost ? 
                     <><Youtube videoId={getYoutubeID(props.object.link)}/>
                     <p onClick={()=>setLinkToDialog(true)}>{props.object.link}</p></>
                 : <Bookmark onClick={()=>setLinkToDialog(true)}>
                     <Picture><img src={props.object.linkImage} /></Picture>
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
                     <Info>
                         <h2>{props.object.linkTitle}</h2>
                         <h3>{props.object.linkDescription}</h3>
@@ -414,7 +379,6 @@ border-radius: 16px;
 display: flex;
 flex-direction: row;
 padding: 20px;
-<<<<<<< HEAD
 .trash-icon{
     display: ${props => (props.userId === props.postUserId) ? 'initial' : 'none'};
     cursor: pointer;
@@ -435,14 +399,12 @@ padding: 20px;
     top: 15px;
     right: 50px;
 }
-=======
 z-index: 2;
 
 @media(max-width: 600px){
     min-height: ${props => props.isYoutubeLink ? '433px': '230px'};
     border-radius: 0px;
     }
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
 `;
 
 const Text = styled.div`
@@ -451,7 +413,6 @@ const Text = styled.div`
     margin-left: 18px;
     display: flex;
     flex-direction:column;
-<<<<<<< HEAD
     input {
         position: absolute;
         top: 20px;
@@ -469,10 +430,6 @@ const Text = styled.div`
         font-family: Lato;
         z-index: ${props => props.toEditPost ? 'initial' : '-1'};
     }
-`;
- 
-
-=======
     iframe{
         height: 281px;
         width: 100%;
@@ -483,7 +440,6 @@ const Text = styled.div`
         font-size: 17px;
     }
 `;
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
 
 const Name = styled.div`
     font-family: Lato;
@@ -571,15 +527,12 @@ h5{
     margin-left: 9px;
     color: white;
 }
-<<<<<<< HEAD
 &:hover{
     background-color: #333333;
 }
-=======
 @media(max-width: 600px){
     font-size: 15px;
     line-height: 18px;
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
 
     }
 `;
@@ -658,7 +611,6 @@ const Picture = styled.div`
     
 `;
 
-<<<<<<< HEAD
 const ModalTitle = styled.div`
     font-size: 34px;
     line-height: 41px;
@@ -671,8 +623,7 @@ const ModalTitle = styled.div`
 
 `
 
-const Buttons = styled.div`
-=======
+
 const CommentBox = styled.div`
     width: 100%;
     height: auto;
@@ -838,13 +789,14 @@ const Confirm = styled.div`
 
 `;
 
-const HorizontalSelector = styled.div`
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6
+
+    
+const Buttons = styled.div`
     display: flex;
     width: 100%;
     flex-direction: row;
     justify-content: space-evenly;
-<<<<<<< HEAD
+
     margin-top: 20px;
     padding: 0 50px;
     @media(max-width: 600px){
@@ -904,7 +856,11 @@ const modalStyles = {
         'alignItems': 'center',
     }
   };
-=======
+  const HorizontalSelector = styled.div`
+    display: flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-evenly;
     font-family: Lato;
     font-style: normal;
     font-weight: bold;
@@ -950,4 +906,3 @@ const Sure = styled.div`
     justify-content: center;
 
 `;
->>>>>>> edc6a9a27d66070f106db3eb77b8e7917f8da0f6

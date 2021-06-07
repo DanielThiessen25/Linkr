@@ -11,7 +11,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import Loader from 'react-loader-spinner'
 
 import useInterval from 'react-useinterval'
-import { useHistory } from 'react-router'
+
 
 export default function Timeline(){
     const { userInformation, setUserInformation , showMenu, setShowMenu, followingUsers, setFollowingUsers } = useContext(UserContext)
@@ -26,7 +26,6 @@ export default function Timeline(){
     const information = JSON.parse(localStorage.getItem("userInformation"));
     let token, id;
     const [isError, setIsError] = useState(false);
-    const history = useHistory();
 
     checkIfLogged();
     function checkIfLogged(){

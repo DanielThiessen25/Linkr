@@ -7,7 +7,7 @@ import UserContext from "../contexts/UserContext";
 import axios from "axios";
 import Post from "../utils/Post";
 import InfiniteScroll from 'react-infinite-scroller';
-import { useHistory } from 'react-router-dom';
+
 
 export default function HashtagPage(){
     const { hashtag } = useParams();
